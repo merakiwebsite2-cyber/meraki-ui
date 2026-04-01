@@ -1,73 +1,61 @@
-import Navbar from "../pages/components/Navbar";
-import AnimateOnScroll from "../pages/components/AnimateOnscroll";
-import ProductsSection from "../pages/components/ProductsSection";
-import DesignSection from "../pages/components/DesignSection";
+import Navbar from "./components/Navbar";
+import AnimateOnScroll from "./components/AnimateOnscroll";
+import ProductsSection from "./components/ProductsSection";
+import DesignSection from "./components/DesignSection";
 import DesignServiceSection from "./components/DesignService";
-import NewArrivals from "./components/NewArrivals"
-import WhyWe from "./components/WhyWe"
+// import NewArrivals from "./components/NewArrivals";
+import WhyWe from "./components/WhyWe";
 import TrendingWorkSection from "./components/TrendingWorkSection";
 import TestimonialsSection from "./components/Testimonial";
-import { useEffect, useRef, useState } from "react";
-function useReveal(threshold = 0.2) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+// import PageWrapper from "./pagewrapper";
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && setVisible(true),
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return [ref, visible];
-}
 export default function Home() {
-    const [sectionRef, visible] = useReveal();
   return (
+    
     <>
+   
       {/* HERO SECTION */}
       <div className="hero">
+            <video
+          className="hero-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src="/bannervideo.mp4" type="video/mp4" />
+        </video>
         <Navbar />
 
-        <div className="hero-content">
-          <AnimateOnScroll y={20}>
-              <h2
-          style={{
-            fontSize: 48,
-            fontWeight: 400,
-            letterSpacing: visible ? 2 : 10,
-            color: "#1f3a52",
-            transition: "letter-spacing 1.2s ease",
-          }}
-        >Find your perfect fabric</h2>
-          </AnimateOnScroll>
-          <p>
-            Lorem Ipsum is that it has a more-or-less normal distribution of
-            letters, as opposed to using Content here.      Lorem Ipsum is that it has a more-or-less normal distribution of
-            letters, as opposed to using Content here.
-          </p>
-             <p>
-            Lorem Ipsum is that it has a more-or-less normal distribution of
-            letters, as opposed to using Content here.
-          </p>
-             <p>
-            Lorem Ipsum is that it has a more-or-less normal distribution of
-            letters, as opposed to using Content here.
-          </p>
-        </div>
-      </div>
+        {/* <div className="hero-left-box"> */}
+          <div>
+            <img src="./logo.png"/>
+            {/* <h1 className="hero-title">
+              Find your perfect <br />
+              <span>FABRIC</span>
+            </h1>
 
-      {/* SECOND SECTION */}
+            <p className="hero-text">
+              Find your perfect fabric, designed to match your style and elevate your space.Discover luxurious textures, rich colors, and timeless patterns crafted with care.From modern elegance to classic charm, we have materials for every vision.Experience quality you can see, feel, and trust.Transform your interiors with fabrics that make a lasting impression.
+            </p> */}
+
+            {/* <p className="hero-text">
+        From modern elegance to classic charm, we have materials for every vision.
+        Experience quality you can see and feel.
+      </p> */}
+          </div>
+        </div>
+      {/* </div> */}
+
+      {/* OTHER SECTIONS */}
       <DesignSection className="mt-4" />
       <ProductsSection />
       <DesignServiceSection />
-      <NewArrivals />
-      <WhyWe/>
-      <TrendingWorkSection/>
-      <TestimonialsSection/>
+      {/* <NewArrivals /> */}
+      <TrendingWorkSection />
+      {/* <WhyWe /> */}
+      
+      {/* <TestimonialsSection /> */}
     </>
   );
 }
-

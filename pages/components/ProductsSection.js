@@ -1,5 +1,5 @@
-import { Input, Card, Row, Col } from "antd";
-import { SearchOutlined, HeartOutlined } from "@ant-design/icons";
+import { Row, Col } from "antd";
+import { HeartOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 
 /* -------------------- DATA -------------------- */
@@ -14,16 +14,14 @@ const products = [
   { title: "Rugs", image: "/rugs.png" },
 ];
 
-/* -------------------- SCROLL REVEAL HOOK -------------------- */
+/* -------------------- SCROLL REVEAL -------------------- */
 function useReveal(threshold = 0.2) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(entry.isIntersecting);
-      },
+      ([entry]) => setVisible(entry.isIntersecting),
       { threshold }
     );
 
@@ -37,7 +35,6 @@ function useReveal(threshold = 0.2) {
   return [ref, visible];
 }
 
-
 /* -------------------- COMPONENT -------------------- */
 export default function ProductsSection() {
   const [sectionRef, visible] = useReveal();
@@ -46,140 +43,157 @@ export default function ProductsSection() {
     <section
       ref={sectionRef}
       style={{
-        padding: "120px 60px",
+        padding: "80px 60px",
         background: "#fff",
-        fontFamily: "serif",
-
-        /* Premium reveal */
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(28px)",
-        transition: "all 1s cubic-bezier(0.22, 1, 0.36, 1)",
+        transform: visible ? "translateY(0)" : "translateY(30px)",
+        transition: "all 1s ease",
       }}
     >
       {/* -------------------- HEADING -------------------- */}
-      <div style={{ marginBottom: 50 }}>
-        <p
+      <div style={{ textAlign: "center", marginBottom: 60 }}>
+        <div
           style={{
-            fontSize: 16,
-            marginBottom: 6,
-            color: "#333",
-          }}
-        >
-          Where quality fabric meets
-        </p>
-
-        <h2
-          style={{
-            fontSize: 48,
-            fontWeight: 400,
-            letterSpacing: visible ? 2 : 10,
+            fontFamily: "'Quicksand', sans-serif",
+            fontSize: 36,
             color: "#1f3a52",
-            transition: "letter-spacing 1.2s ease",
           }}
         >
-          TIMELESS DESIGN
-        </h2>
-      </div>
+          Quality you can feel,
+        </div>
 
-      {/* -------------------- HEADER ROW -------------------- */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 50,
-        }}
-      >
-        <h3 style={{ fontSize: 40, fontWeight: 400 }}>Products</h3>
-
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="Search"
+        <h1
           style={{
-            width: 280,
-            borderRadius: 20,
-            transition: "all 0.3s ease",
+            fontFamily: "'Satisfy'",
+            fontSize: 60,
+            color: "#1f3a52",
+            margin: 0,
           }}
-          onFocus={(e) =>
-            (e.target.style.boxShadow =
-              "0 0 0 3px rgba(31,58,82,0.15)")
-          }
-          onBlur={(e) => (e.target.style.boxShadow = "none")}
-        />
+        >
+          Design that never fades.
+        </h1>
       </div>
 
       {/* -------------------- PRODUCTS GRID -------------------- */}
       <Row gutter={[24, 36]}>
         {products.map((item, index) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <section
-              hoverable
-              bodyStyle={{ padding: 0 }}
+            <div
               style={{
-                borderRadius: 22,
-                border: "none",
+                borderRadius: 10,
                 overflow: "hidden",
+                position: "relative",
+                cursor: "pointer",
 
-                /* Staggered reveal */
                 opacity: visible ? 1 : 0,
                 transform: visible
                   ? "translateY(0)"
                   : "translateY(30px)",
-                transition:
-                  "all 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
-                transitionDelay: `${index * 80}ms`,
+                transition: "all 0.6s ease",
+                transitionDelay: `${index * 100}ms`,
               }}
             >
               {/* IMAGE */}
-              <div style={{ overflow: "hidden" }}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  style={{
-                    height: 400,
-                    width: "100%",
-                    objectFit: "cover",
-                    transition: "transform 0.9s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.transform =
-                      "scale(1.06)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform =
-                      "scale(1)")
-                  }
-                />
-              </div>
-
-              {/* FOOTER */}
-              <div
+              <img
+                src={item.image}
+                alt={item.title}
                 style={{
-                  padding: "14px 18px",
+                  width: "100%",
+                  height: 400,
+                  objectFit: "cover",
+                  transition: "transform 0.8s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.08)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              />
+
+              {/* OVERLAY */}
+              <div
+                className="overlay"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "rgba(0,0,0,0.45)",
+                  opacity: 0,
                   display: "flex",
-                  justifyContent: "space-between",
                   alignItems: "center",
+                  justifyContent: "center",
+                  transition: "opacity 0.4s ease",
                 }}
               >
-                <span style={{ fontSize: 14 }}>{item.title}</span>
+                <div
+                  className="overlay-text"
+                  style={{
+                    color: "#fff",
+                    fontSize: 24,
+                    fontFamily: "'Quicksand', sans-serif",
+                    letterSpacing: "1px",
+                    transform: "translateY(20px)",
+                    opacity: 0,
+                    transition: "all 0.4s ease",
+                  }}
+                >
+                  {item.title}
+                </div>
+              </div>
 
+              {/* HOVER HANDLER */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                }}
+                onMouseEnter={(e) => {
+                  const parent = e.currentTarget.parentElement;
+                  const overlay = parent.querySelector(".overlay");
+                  const text = parent.querySelector(".overlay-text");
+
+                  overlay.style.opacity = 1;
+                  text.style.opacity = 1;
+                  text.style.transform = "translateY(0)";
+                }}
+                onMouseLeave={(e) => {
+                  const parent = e.currentTarget.parentElement;
+                  const overlay = parent.querySelector(".overlay");
+                  const text = parent.querySelector(".overlay-text");
+
+                  overlay.style.opacity = 0;
+                  text.style.opacity = 0;
+                  text.style.transform = "translateY(20px)";
+                }}
+              />
+
+              {/* HEART ICON */}
+              {/* <div
+                style={{
+                  position: "absolute",
+                  bottom: 15,
+                  right: 15,
+                  color: "#fff",
+                }}
+              >
                 <HeartOutlined
                   style={{
-                    color: "#999",
+                    fontSize: 18,
                     cursor: "pointer",
-                    transition: "all 0.3s ease",
+                    transition: "transform 0.3s ease",
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#1f3a52";
-                    e.currentTarget.style.transform = "scale(1.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "#999";
-                    e.currentTarget.style.transform = "scale(1)";
-                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                 />
-              </div>
-            </section>
+              </div> */}
+            </div>
           </Col>
         ))}
       </Row>

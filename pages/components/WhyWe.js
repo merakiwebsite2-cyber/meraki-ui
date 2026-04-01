@@ -1,175 +1,117 @@
-import { Row, Col } from "antd";
 import { useEffect, useRef, useState } from "react";
 
-/* ---------- SCROLL REVEAL ---------- */
-function useReveal(threshold = 0.2) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(entry.isIntersecting);
-      },
-      { threshold }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, [threshold]);
-
-  return [ref, visible];
-}
-
-
-const reasons = [
+const sections = [
   {
-    number: "01",
-    title: "Premium-Grade Fabrics, Tested for Quality",
-    desc:
-      "We source and produce fabrics using the finest materials, ensuring durability, colorfastness, and a premium feel you can trust.",
-    bg: "#8fa3b3",
-    dark: true,
+    title: "Premium Fabrics",
+    desc: "Crafted with precision and quality materials.",
+    image: "/fabrics1.png",
   },
   {
-    number: "02",
-    title: "Trend-Focused Designs & Wide Variety",
-    desc:
-      "From classic weaves to modern prints, we stay ahead of trends—offering a wide selection to match every style, purpose, and season.",
-    bg: "#c7d2d9",
+    title: "Timeless Designs",
+    desc: "Modern elegance blended with tradition.",
+    image: "/fabrics2.png",
   },
   {
-    number: "03",
-    title: "Consistent Supply & Timely Delivery",
-    desc:
-      "With strong production capacity and careful inventory management, we ensure seamless availability and on-time delivery for all order sizes.",
-    bg: "#eef1f3",
+    title: "Reliable Supply",
+    desc: "Consistent delivery you can trust.",
+    image: "/fabrics3.png",
   },
 ];
 
-export default function WhyWeSection() {
-  const [sectionRef, visible] = useReveal();
+export default function WhyWeZaraStyle() {
+  const containerRef = useRef(null);
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollProgress = Math.min(
+        Math.max(-rect.top / window.innerHeight, 0),
+        sections.length - 1
+      );
+
+      setCurrent(Math.round(scrollProgress));
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <section
-      ref={sectionRef}
+    <div
+      ref={containerRef}
       style={{
-        padding: "120px 80px",
-        background: "#fff",
-        fontFamily: "serif",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(40px)",
-        transition: "all 1s cubic-bezier(0.22, 1, 0.36, 1)",
+        height: `${sections.length * 100}vh`, // 🔥 controls scroll length
+        position: "relative",
+      
       }}
     >
-      {/* -------- HEADER -------- */}
-      <div style={{ maxWidth: 900 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-            marginBottom: 24,
-          }}
-        >
-          <h2 style={{ fontSize: 28, fontWeight: 400 }}>Why We</h2>
+      {/* STICKY CONTAINER */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
+        {sections.map((item, index) => {
+          let transform = "translateX(100%)";
 
-          {/* animated divider */}
-          <div
-            style={{
-              height: 1,
-              background: "#cfcfcf",
-              flex: 1,
-              transform: visible ? "scaleX(1)" : "scaleX(0)",
-              transformOrigin: "left",
-              transition: "transform 1.2s ease",
-            }}
-          />
-        </div>
+          if (index === current) {
+            transform = "translateX(0)";
+          } else if (index < current) {
+            transform = "translateX(-100%)";
+          }
 
-        <p
-          style={{
-            color: "#666",
-            lineHeight: 1.8,
-            maxWidth: 760,
-            opacity: visible ? 1 : 0,
-            transition: "opacity 1s ease 0.4s",
-          }}
-        >
-          Lorem Ipsum is that it has a more-or-less normal distribution of
-          letters, as opposed to using 'Content here, content here', making it
-          look like readable English. Many desktop publishing packages and web
-          page editors now use Lorem Ipsum as their default model text, and a
-          search for 'lorem ipsum' will uncover many web sites still in their
-          infancy. Various versions have evolved over the years, sometimes by
-          accident, sometimes on purpose (injected humour and the like).
-        </p>
-      </div>
-
-      {/* -------- CARDS -------- */}
-      <Row gutter={32} style={{ marginTop: 80 }}>
-        {reasons.map((item, index) => (
-          <Col md={8} key={index}>
+          return (
             <div
+              key={index}
               style={{
-                height: "100%",
-                padding: 32,
-                background: item.bg,
-                color: item.dark ? "#fff" : "#000",
-                borderRadius: 6,
-                position: "relative",
-                opacity: visible ? 1 : 0,
-                transform: visible
-                  ? "translateY(0)"
-                  : "translateY(30px)",
-                transition: `all 0.7s ease ${0.4 + index * 0.15}s`,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-8px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
+                position: "absolute",
+                inset: 0,
+                transform,
+                transition: "transform 0.8s ease",
               }}
             >
-              {/* Number */}
-              <span
+              {/* IMAGE */}
+              <img
+                src={item.image}
                 style={{
-                  fontSize: 36,
-                  fontWeight: 500,
-                  opacity: item.dark ? 0.8 : 0.3,
-                  display: "block",
-                  marginBottom: 16,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
                 }}
-              >
-                {item.number}
-              </span>
+              />
 
-              <h4
+              {/* OVERLAY */}
+              <div
                 style={{
-                  fontSize: 18,
-                  marginBottom: 16,
-                  lineHeight: 1.4,
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(to right, rgba(0,0,0,0.5), transparent)",
                 }}
-              >
-                {item.title}
-              </h4>
+              />
 
-              <p
+              {/* TEXT */}
+              <div
                 style={{
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                  opacity: item.dark ? 0.9 : 0.8,
+                  position: "absolute",
+                  top: "50%",
+                  left: "10%",
+                  transform: "translateY(-50%)",
+                  color: "#fff",
+                  maxWidth: 400,
                 }}
               >
-                {item.desc}
-              </p>
+                <h2 style={{ fontSize: 48 }}>{item.title}</h2>
+                <p>{item.desc}</p>
+              </div>
             </div>
-          </Col>
-        ))}
-      </Row>
-    </section>
+          );
+        })}
+      </div>
+    </div>
   );
 }

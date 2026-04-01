@@ -1,10 +1,12 @@
 import { Layout, Menu, Button } from "antd";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const { Header } = Layout;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => {
@@ -18,51 +20,75 @@ export default function Navbar() {
   return (
     <Header
       style={{
-        position: "sticky",
+        position: "fixed",
         top: 0,
+        left: 0,
+        width: "100%",
         zIndex: 1000,
 
         display: "flex",
         alignItems: "center",
+        justifyContent: "space-between",
 
-        padding: scrolled ? "10px 60px" : "20px 60px",
-        height: "auto",
+        padding: "0 80px",
+        height: 70,
 
-        background: scrolled
-          ? "rgba(255, 255, 255, 0.95)"
-          : "transparent",
+        background: scrolled ? "rgba(0,0,0,0.9)" : "transparent",
+        backdropFilter: scrolled ? "blur(6px)" : "none",
+        boxShadow: scrolled ? "0 2px 10px rgba(0,0,0,0.3)" : "none",
 
-        backdropFilter: scrolled ? "blur(8px)" : "none",
-
-        transition: "all 0.35s ease",
+        transition: "all 0.35s ease"
       }}
     >
-      {/* Logo placeholder */}
-      <div style={{ width: 120 }} />
+      {/* LEFT - LOGO */}
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src="/logo.png"
+          alt="logo"
+          style={{
+            height: 90,
+            objectFit: "contain",
+            cursor: "pointer"
+          }}
+          onClick={() => router.push("/")}
+        />
+      </div>
 
+      {/* CENTER - MENU */}
       <Menu
         mode="horizontal"
         selectable={false}
         style={{
           flex: 1,
+          display: "flex",
           justifyContent: "center",
           background: "transparent",
-          borderBottom: "none",
-          color: scrolled ? "#1f3a52" : "#fff",
+          borderBottom: "none"
         }}
         items={[
-          { key: "1", label: "Home" },
-          { key: "2", label: "Products" },
-          { key: "3", label: "Contact" },
+          {
+            key: "1",
+            label: <span style={{ color: "#fff" }}>Home</span>
+          },
+          {
+            key: "2",
+            label: <span style={{ color: "#fff" }}>Products</span>
+          },
+          {
+            key: "3",
+            label: <span style={{ color: "#fff" }}>Contact</span>
+          }
         ]}
       />
 
+      {/* RIGHT - BUTTON */}
       <Button
+        onClick={() => router.push("/login")}
         style={{
           borderRadius: 20,
-          borderColor: scrolled ? "#1f3a52" : "#fff",
-          color: scrolled ? "#1f3a52" : "#fff",
-          background: "transparent",
+          borderColor: "#fff",
+          color: "#fff",
+          background: "transparent"
         }}
       >
         Sign in
