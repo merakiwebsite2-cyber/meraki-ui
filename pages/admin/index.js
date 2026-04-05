@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import AdminLogin from "@/src/components/AdminLogin";
 
 const index = () => {
   return (
-    <div>admin login</div>
-  )
-}
+    <div>
+      <AdminLogin />
+    </div>
+  );
+};
 
-export default index
+export default index;

@@ -1,7 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, Button, Card, Space, message } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  Button,
+  Card,
+  Space,
+  message,
+  Typography,
+  Checkbox,
+} from "antd";
 import ImageUpload from "../UI/ImageUpload";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
@@ -85,13 +96,13 @@ const ProductFormModal = ({
   const handleFinish = async (values) => {
     setLoading(true);
     values.product.defaultVariant.mainImageUrl =
-      values.product.defaultVariant.mainImageUrl[0];
+      values.product.defaultVariant.mainImageUrl?.[0];
 
     values.variantList = values.variantList?.map((x) => ({
       ...x,
       mainImageUrl: x.mainImageUrl?.[0],
     }));
-
+    console.log("values", values);
     if (initialValues?.id) {
       const data = await apiRequest({
         endpoint: `/products/${initialValues.id}/update-with-urls`,
@@ -130,7 +141,7 @@ const ProductFormModal = ({
       onCancel={onClose}
       loading={loading}
       destroyOnClose
-      width={700}
+      width={800}
       footer={null}
     >
       <Form
@@ -159,10 +170,59 @@ const ProductFormModal = ({
           >
             <Input placeholder="Enter collection" style={{ width: "300px" }} />
           </Form.Item>
+
+          <Form.Item
+            name={["product", "martindale"]}
+            label="Martindale"
+            rules={[{ required: true, message: "Enter Martindale" }]}
+          >
+            <Input
+              placeholder="Enter Martindale (e.g. 50,000 RUBS)"
+              style={{ width: "300px" }}
+            />
+          </Form.Item>
+          <Form.Item
+            name={["product", "pilling"]}
+            label="Pilling"
+            rules={[{ required: true, message: "Enter pilling" }]}
+          >
+            <Input
+              placeholder="Enter pilling (e.g. 8-7)"
+              style={{ width: "300px" }}
+            />
+          </Form.Item>
+          <Form.Item
+            name={["product", "waterRepellent"]}
+            valuePropName="checked"
+            noStyle
+            rules={[{ required: true, message: "Enter waterRepellent" }]}
+          >
+            <Checkbox>Water Repellent</Checkbox>
+          </Form.Item>
+          <Form.Item
+            name={["product", "flameRetardancy"]}
+            label="Flame Retardancy"
+            rules={[{ required: false, message: "Enter flameRetardancy" }]}
+          >
+            <Input
+              placeholder="Enter flameRetardancy"
+              style={{ width: "300px" }}
+            />
+          </Form.Item>
+          <Form.Item
+            name={["product", "attention"]}
+            label="Attention"
+            rules={[{ required: true, message: "Enter attention" }]}
+          >
+            <Input.TextArea
+              placeholder="Enter Attention"
+              style={{ width: "700px" }}
+            />
+          </Form.Item>
         </Space>
 
         <Card title="Specification" style={{ marginBottom: 16 }}>
-          <Space direction="horizontal">
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
             <Form.Item
               name={["product", "specification", "length"]}
               label="Length"
@@ -184,7 +244,101 @@ const ProductFormModal = ({
                 style={{ width: "300px" }}
               />
             </Form.Item>
-          </Space>
+
+            <Form.Item
+              name={["product", "specification", "composition"]}
+              label="Composition"
+              rules={[{ required: true, message: "Enter composition" }]}
+            >
+              <Input
+                placeholder="Enter composition"
+                style={{ width: "300px" }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name={["product", "specification", "weight"]}
+              label="Weight"
+              rules={[{ required: true, message: "Enter weight" }]}
+            >
+              <Input placeholder="Enter weight" style={{ width: "300px" }} />
+            </Form.Item>
+
+            <div>
+              <Typography.Text strong>Repeat (cm)</Typography.Text>
+              <br />
+              <br />
+              <Space dir="horizontal">
+                <Form.Item
+                  name={["product", "specification", "repeat", "vertical"]}
+                  label="Vertical(W)"
+                  rules={[{ required: true, message: "Enter vertical" }]}
+                >
+                  <Input
+                    placeholder="Enter vertical (e.g. 8.7)"
+                    style={{ width: "300px" }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name={["product", "specification", "repeat", "horizontal"]}
+                  label="Horizontal(L)"
+                  rules={[{ required: true, message: "Enter horizontal" }]}
+                >
+                  <Input
+                    placeholder="Enter horizontal (e.g. 18.1)"
+                    style={{ width: "300px" }}
+                  />
+                </Form.Item>
+              </Space>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Care and Usage Instractions" style={{ marginBottom: 16 }}>
+          <Form.Item label="Care Instructions">
+            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+              <Form.Item
+                name={["product", "careInstructions", "wash"]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>Wash</Checkbox>
+              </Form.Item>
+
+              <Form.Item
+                name={["product", "careInstructions", "bleach"]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>Bleach</Checkbox>
+              </Form.Item>
+
+              <Form.Item
+                name={["product", "careInstructions", "dry"]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>Dry</Checkbox>
+              </Form.Item>
+
+              <Form.Item
+                name={["product", "careInstructions", "iron"]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>Iron</Checkbox>
+              </Form.Item>
+
+              <Form.Item
+                name={["product", "careInstructions", "dryClean"]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>Dry Clean</Checkbox>
+              </Form.Item>
+            </div>
+          </Form.Item>
         </Card>
 
         <Card title="Default Variant" style={{ marginBottom: 16 }}>
