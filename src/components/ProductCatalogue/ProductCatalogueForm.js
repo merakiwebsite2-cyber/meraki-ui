@@ -195,7 +195,7 @@ const ProductFormModal = ({
             name={["product", "waterRepellent"]}
             valuePropName="checked"
             noStyle
-            rules={[{ required: true, message: "Enter waterRepellent" }]}
+            rules={[{ required: false, message: "Enter waterRepellent" }]}
           >
             <Checkbox>Water Repellent</Checkbox>
           </Form.Item>
