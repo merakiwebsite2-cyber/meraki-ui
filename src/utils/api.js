@@ -1,4 +1,6 @@
-export const BASE_URL = "https://139.84.140.129:8443";
+export const BASE_URL = "https://api.meraki-interiors.ae";
+
+export const STORAGE_BASE_URL = "https://storage.meraki-interiors.ae"
 
 export const apiRequest = async ({
   endpoint,

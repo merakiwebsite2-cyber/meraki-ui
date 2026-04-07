@@ -1,7 +1,7 @@
 import { Upload, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { BASE_URL } from "@/src/utils/api";
+import { BASE_URL, STORAGE_BASE_URL } from "@/src/utils/api";
 
 const ImageUpload = ({ maxCount = 1, value = [], onChange }) => {
   const fileList = value.map((url, index) => ({
@@ -14,7 +14,7 @@ const ImageUpload = ({ maxCount = 1, value = [], onChange }) => {
   const customRequest = async ({ file, onSuccess, onError }) => {
     const formData = new FormData();
     formData.append("file", file);
-    let url = BASE_URL + "/api/images/upload";
+    let url = STORAGE_BASE_URL + "/api/images/upload";
     try {
       const res = await fetch(url, {
         method: "POST",
