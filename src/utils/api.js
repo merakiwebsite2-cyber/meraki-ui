@@ -1,4 +1,4 @@
-export const BASE_URL = "http://139.84.140.129:8000";
+export const BASE_URL = "https://139.84.140.129:8443";
 
 export const apiRequest = async ({
   endpoint,
