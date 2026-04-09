@@ -95,17 +95,33 @@ const ProductCatalogueTable = () => {
     {
       title: "Specification",
       dataIndex: "specification",
-      render: (value) => {
+  render: (value) => {
+  return (
+    <div>
+      {Object.entries(value || {}).map(([key, val], index) => {
+        // Handle nested objects (repeat, careInstructions)
+        if (typeof val === "object" && val !== null) {
+          return (
+            <div key={index}>
+              <strong>{key}:</strong>
+              {Object.entries(val).map(([k, v]) => (
+                <div key={k} style={{ marginLeft: 10 }}>
+                  {k}: {String(v)}
+                </div>
+              ))}
+            </div>
+          );
+        }
+
         return (
-          <div>
-            {Object.entries(value || {}).map(([key, val], index) => (
-              <div key={index}>
-                <strong>{key}:</strong> {val}
-              </div>
-            ))}
+          <div key={index}>
+            <strong>{key}:</strong> {String(val)}
           </div>
         );
-      },
+      })}
+    </div>
+  );
+}
     },
     {
       title: "Article",

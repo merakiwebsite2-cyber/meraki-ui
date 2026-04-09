@@ -279,10 +279,10 @@ section {
   align-items: center;
   justify-content: center;
 
-  gap: 120px;
+  gap: 80px;
+  padding: 100px 60px;
 
-  padding: 120px 80px;
-  background: #f7f7f7;
+  flex-wrap:nowrap; /* 🔥 VERY IMPORTANT */
 }
 
 /* LEFT IMAGE AREA */
@@ -295,7 +295,7 @@ section {
 /* top blob image */
 
 .fabric-bg {
-  width: 100%;
+  width: 120%;
   border-radius: 52% 17% 52% 60%;
 }
 
@@ -306,7 +306,7 @@ section {
   bottom: -80px;
   left: 80px;
 
-  width: 300px;
+  width:230px;
 
   animation: floatPerson 4s ease-in-out infinite;
 }
@@ -328,30 +328,35 @@ section {
 }
 
 .fabric-content {
-  max-width: 520px;
+  max-width: 100%;
+  width: 100%;
 }
 
+/* HEADING */
 .fabric-content h2 {
   font-family: 'Literata', serif;
-  font-size: 35px;
-  font-weight: 600;
-  width: 606px;
+
+  font-size: clamp(22px, 3vw, 36px); /* 🔥 auto scale */
   line-height: 1.4;
 
   color: #3b2b26;
+  margin-bottom: 20px;
 
-  margin-bottom: 24px;
+  width: 100%; /* ❌ remove fixed width */
+  word-wrap: break-word;
 }
 
+/* PARAGRAPH */
 .fabric-content p {
   font-family: 'Inter', sans-serif;
-width: 706px;
-  font-size: 23px;
-  line-height: 1.4;
+
+  font-size: clamp(14px, 1.8vw, 20px); /* 🔥 auto scale */
+  line-height: 1.6;
 
   color: #6b6b6b;
-
   margin-bottom: 16px;
+
+  width: 100%; /* ❌ remove fixed width */
 }
 
 .appointment-btn {
@@ -499,3 +504,288 @@ width: 706px;
 .custom-table .ant-table-tbody>tr:first-child>td {
   border-top: none;
 }
+
+/* ============================= */
+/* GLOBAL RESPONSIVE FIXES */
+/* ============================= */
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================= */
+/* HERO RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .hero {
+    padding-left: 60px;
+    height: 80vh;
+  }
+
+  .hero-title {
+    font-size: 48px;
+  }
+
+  .hero-title span {
+    font-size: 64px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding-left: 20px;
+    padding-right: 20px;
+    justify-content: center;
+    text-align: center;
+    height: 70vh;
+  }
+
+  .hero-left-box {
+    padding: 40px 25px;
+  }
+
+  .hero-title {
+    font-size: 34px;
+  }
+
+  .hero-title span {
+    font-size: 42px;
+    letter-spacing: 2px;
+  }
+
+  .hero-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: 60vh;
+  }
+
+  .hero-title {
+    font-size: 26px;
+  }
+
+  .hero-title span {
+    font-size: 32px;
+  }
+
+  .hero-text {
+    font-size: 13px;
+  }
+}
+
+/* ============================= */
+/* NAVBAR RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+
+  .nav-menu {
+    display: none; /* 🔥 hide menu for now (use hamburger later) */
+  }
+
+  .signin-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ============================= */
+/* DESIGN SECTION */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .design-content {
+    padding: 80px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .design-section {
+    text-align: center;
+  }
+
+  .design-content {
+    padding: 60px 20px;
+  }
+
+  .design-content h2 {
+    font-size: 28px;
+  }
+
+  .design-content p {
+    font-size: 14px;
+  }
+}
+
+/* ============================= */
+/* FABRIC SECTION */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .fabric-section {
+    flex-direction: column; /* 🔥 stack ONLY on mobile */
+    padding: 60px 20px;
+  }
+
+  .fabric-image-wrapper,
+  .fabric-content {
+    max-width: 100%;
+  }
+
+  .fabric-content h2 {
+    width: 100%;
+    font-size: 28px;
+  }
+
+  .fabric-content p {
+    width: 100%;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fabric-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 60px 20px;
+    gap: 40px;
+  }
+
+  .fabric-image-wrapper {
+   .fabric-image-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column; /* stack images */
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  .fabric-person {
+    position: relative;
+    bottom: 100;
+    left: 0;
+
+    width: 80%;
+    max-width: 250px;
+
+    /* margin-bottom: 10px; */
+  }
+
+    .fabric-bg {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .fabric-content h2 {
+    font-size: 24px;
+  }
+
+  .fabric-content p {
+    font-size: 16px;
+  }
+
+  .appointment-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+}
+
+/* ============================= */
+/* OWL + PATTERN */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .owl-image {
+    width: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+  }
+
+  .pattern-runner {
+    height: 80px;
+  }
+
+  .pattern-runner img {
+    height: 80px;
+  }
+}
+
+/* ============================= */
+/* HOSPITALITY SECTION */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .hospitality-content {
+    margin-left: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hospitality-content {
+    margin-left: 0;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .line-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .line-item h2 {
+    font-size: 22px;
+  }
+
+  .line-item p {
+    font-size: 18px;
+  }
+}
+
+/* ============================= */
+/* TABLE RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .custom-table {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+
+  .fabric-image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .fabric-bg {
+    width: 100%;
+    display: block;
+  }
+
+  .fabric-person {
+    position: absolute;
+
+    left: 50%;
+    transform: translateX(-50%);
+
+    bottom: -15px; /* adjust overlap */
+
+    width: 70%;
+  }
+}
+}
+
+

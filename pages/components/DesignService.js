@@ -25,7 +25,20 @@ export default function DesignServiceSection() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
-  // AUTO SLIDE
+  /* ✅ SSR SAFE SCREEN WIDTH */
+  const [screenWidth, setScreenWidth] = useState(1024);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  /* AUTO SLIDE */
   useEffect(() => {
     if (paused) return;
 
@@ -39,11 +52,16 @@ export default function DesignServiceSection() {
   return (
     <section
       ref={sectionRef}
-      onMouseEnter={() => setPaused(true)}   // pause on hover
+      onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       style={{
         position: "relative",
-        height: "90vh",
+        height:
+          screenWidth < 480
+            ? "70vh"
+            : screenWidth < 768
+            ? "80vh"
+            : "90vh",
         width: "100%",
         overflow: "hidden",
         fontFamily: "serif",
@@ -93,17 +111,39 @@ export default function DesignServiceSection() {
           transition: "all 1s ease",
         }}
       >
-        <h2 style={{ fontSize: 40, marginBottom: 20 }}>
+        <h2
+          style={{
+            fontSize:
+              screenWidth < 480
+                ? 20
+                : screenWidth < 768
+                ? 28
+                : 40,
+            marginBottom: 20,
+          }}
+        >
           Explore Our Comprehensive{" "}
           <span style={{ color: "#ddd" }}>Design Service</span>
         </h2>
 
-        <p style={{ maxWidth: 800, lineHeight: 1.6,fontSize:20,width:900 }}>
- At Meraki Fabric Solution, we specialize in delivering a comprehensive, end-to-end fabric design service specifically curated to meet the sophisticated demands of interior designers, contractors, architects, furniture manufacturers, and homeowners across the UAE. Our dedicated team of experts manages the entire creative lifecycle, from initial concept development and brand alignment to final production, ensuring every textile solution meets your exact functional requirements. By providing professional guidance through a vast selection of textures, custom color palettes, intricate patterns, and high-performance finishing techniques, we empower our clients to transform their vision into elevated, customized spaces
+        <p
+          style={{
+            maxWidth: "90%",
+            margin: "0 auto",
+            lineHeight: 1.6,
+            fontSize:
+              screenWidth < 480
+                ? 14
+                : screenWidth < 768
+                ? 16
+                : 20,
+          }}
+        >
+        At Meraki Fabric Solution, we specialize in delivering a comprehensive, end-to-end fabric design service specifically curated to meet the sophisticated demands of interior designers, contractors, architects, furniture manufacturers, and homeowners across the UAE. Our dedicated team of experts manages the entire creative lifecycle, from initial concept development and brand alignment to final production, ensuring every textile solution meets your exact functional requirements. By providing professional guidance through a vast selection of textures, custom color palettes, intricate patterns, and high-performance finishing techniques, we empower our clients to transform their vision into elevated, customized spaces
         </p>
       </div>
 
-      {/* CONTROLS */}
+      {/* DOT CONTROLS */}
       <div
         style={{
           position: "absolute",
@@ -120,10 +160,15 @@ export default function DesignServiceSection() {
             key={index}
             onClick={() => {
               setCurrent(index);
-              setPaused(true); // stop auto when user interacts
+              setPaused(true);
             }}
             style={{
-              width: current === index ? 24 : 10,
+              width:
+                current === index
+                  ? screenWidth < 480
+                    ? 18
+                    : 24
+                  : 10,
               height: 10,
               borderRadius: 20,
               background: "#fff",
@@ -144,7 +189,7 @@ export default function DesignServiceSection() {
           transform: "translateY(-50%)",
           display: "flex",
           justifyContent: "space-between",
-          padding: "0 30px",
+          padding: screenWidth < 480 ? "0 10px" : "0 30px",
           zIndex: 3,
         }}
       >
@@ -159,8 +204,9 @@ export default function DesignServiceSection() {
             background: "rgba(255,255,255,0.2)",
             border: "none",
             color: "#fff",
-            fontSize: 24,
-            padding: "8px 14px",
+            fontSize: screenWidth < 480 ? 18 : 24,
+            padding:
+              screenWidth < 480 ? "6px 10px" : "8px 14px",
             cursor: "pointer",
             borderRadius: 6,
           }}
@@ -177,8 +223,9 @@ export default function DesignServiceSection() {
             background: "rgba(255,255,255,0.2)",
             border: "none",
             color: "#fff",
-            fontSize: 24,
-            padding: "8px 14px",
+            fontSize: screenWidth < 480 ? 18 : 24,
+            padding:
+              screenWidth < 480 ? "6px 10px" : "8px 14px",
             cursor: "pointer",
             borderRadius: 6,
           }}

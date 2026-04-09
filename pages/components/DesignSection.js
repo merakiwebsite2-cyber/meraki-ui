@@ -1,11 +1,13 @@
 import { Button } from "antd";
 import { useEffect, useRef, useState } from "react";
-
+import { useRouter } from "next/navigation";
 /* ---------- REVEAL HOOK (same pattern you use) ---------- */
 function useReveal(threshold = 0.2) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+
+ 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -26,26 +28,29 @@ function useReveal(threshold = 0.2) {
 
 /* ---------------- COMPONENT ---------------- */
 export default function DesignSection() {
+    const router = useRouter();
+   const handleAppointmentClick = () => {
+    router.push("/login");
+  };
   const [sectionRef, visible] = useReveal();
 
- return (
+  return (
     <section className="fabric-section">
 
       {/* LEFT IMAGE AREA */}
       <div className="fabric-image-wrapper">
 
-        {/* Background blob image */}
-        <img
-          src="/upimage.png"
-       
-              className="fabric-person"
-          alt="fabric map"
-        />
-
-        {/* Floating person */}
+        {/* Background FIRST */}
         <img
           src="/downimage.png"
-         className="fabric-bg"
+          className="fabric-bg"
+          alt="map"
+        />
+
+        {/* Person SECOND */}
+        <img
+          src="/upimage.png"
+          className="fabric-person"
           alt="person"
         />
 
@@ -74,7 +79,10 @@ export default function DesignSection() {
           customizable fabric solutions tailored to your needs.
         </p>
 
-        <button className="appointment-btn">
+        <button
+          className="appointment-btn"
+          onClick={handleAppointmentClick}
+        >
           Request for appointment
         </button>
 
