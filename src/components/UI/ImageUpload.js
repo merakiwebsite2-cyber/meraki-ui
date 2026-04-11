@@ -14,7 +14,7 @@ const ImageUpload = ({ maxCount = 1, value = [], onChange }) => {
   const customRequest = async ({ file, onSuccess, onError }) => {
     const formData = new FormData();
     formData.append("file", file);
-    let url = STORAGE_BASE_URL + "/api/images/upload";
+    let url = BASE_URL + "/api/images/upload";
     try {
       const res = await fetch(url, {
         method: "POST",

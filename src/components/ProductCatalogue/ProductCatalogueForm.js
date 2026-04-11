@@ -71,14 +71,16 @@ const ProductFormModal = ({
               vertical: product.specification?.repeat?.vertical,
               horizontal: product.specification?.repeat?.horizontal,
             },
+
+            careInstructions: {
+              wash: product.careInstructions?.wash,
+              bleach: product.careInstructions?.bleach,
+              dry: product.careInstructions?.dry,
+              iron: product.careInstructions?.iron,
+              dryClean: product.careInstructions?.dryClean,
+            },
           },
-          careInstructions: {
-            wash: product.careInstructions?.wash,
-            bleach: product.careInstructions?.bleach,
-            dry: product.careInstructions?.dry,
-            iron: product.careInstructions?.iron,
-            dryClean: product.careInstructions?.dryClean,
-          },
+
           defaultVariant: {
             id: product.defaultVariant?.id,
             article: product.defaultVariant?.article,
@@ -206,8 +208,8 @@ const ProductFormModal = ({
 
           <Form.Item
             name={["product", "pilling"]}
-            label="Pilling"
-            rules={[{ required: true }]}
+            label="Filling"
+          // rules={[{ required: true }]}
           >
             <Input style={{ width: 300 }} />
           </Form.Item>
@@ -291,15 +293,15 @@ const ProductFormModal = ({
           <Form.Item label="Care Instructions">
             <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
               <Form.Item
-                name={["product", "careInstructions", "wash"]}
+                name={["product", "specification", "careInstructions", "wash"]}
                 valuePropName="checked"
                 noStyle
               >
-              <Checkbox>Wash</Checkbox>
+                <Checkbox>Wash</Checkbox>
               </Form.Item>
 
               <Form.Item
-                name={["product", "careInstructions", "bleach"]}
+                name={["product", "specification", "careInstructions", "bleach"]}
                 valuePropName="checked"
                 noStyle
               >
@@ -307,7 +309,7 @@ const ProductFormModal = ({
               </Form.Item>
 
               <Form.Item
-                name={["product", "careInstructions", "dry"]}
+                name={["product", "specification", "careInstructions", "dry"]}
                 valuePropName="checked"
                 noStyle
               >
@@ -315,7 +317,7 @@ const ProductFormModal = ({
               </Form.Item>
 
               <Form.Item
-                name={["product", "careInstructions", "iron"]}
+                name={["product", "specification", "careInstructions", "iron"]}
                 valuePropName="checked"
                 noStyle
               >
@@ -323,7 +325,7 @@ const ProductFormModal = ({
               </Form.Item>
 
               <Form.Item
-                name={["product", "careInstructions", "dryClean"]}
+                name={["product", "specification", "careInstructions", "dryClean"]}
                 valuePropName="checked"
                 noStyle
               >
@@ -459,11 +461,11 @@ const ProductFormModal = ({
             marginTop: "20px",
           }}
         >
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            Submit
-          </Button>
-        </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Submit
+            </Button>
+          </Form.Item>
           <Button
             type="default"
             loading={loading}
