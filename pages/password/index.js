@@ -26,8 +26,13 @@ export default function ChangePassword() {
       if (data?.success) {
         message.success("Password changed successfully");
 
-        // Redirect after change
-        setTimeout(() => router.push("/product"), 1500);
+        // ✅ Save flag in localStorage
+        localStorage.setItem("passwordChanged", "true");
+
+        // ✅ Redirect to login page
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
       } else {
         message.error(data?.message || "Failed to change password");
       }
@@ -50,14 +55,23 @@ export default function ChangePassword() {
       }}
     >
       <div style={{ width: 420 }}>
-        <h1 style={{ fontSize: 42, marginBottom: 30, color: "#4b1e1e" }}>
+        <h1
+          style={{
+            fontSize: 42,
+            marginBottom: 30,
+            color: "#4b1e1e",
+            textAlign: "center",
+          }}
+        >
           Change Password
         </h1>
 
         <Form layout="vertical" onFinish={handleChangePassword}>
           <Form.Item
             name="oldPassword"
-            rules={[{ required: true, message: "Enter old password" }]}
+            rules={[
+              { required: true, message: "Enter old password" },
+            ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
@@ -68,7 +82,10 @@ export default function ChangePassword() {
 
           <Form.Item
             name="newPassword"
-            rules={[{ required: true, message: "Enter new password" }]}
+            rules={[
+              { required: true, message: "Enter new password" },
+              { min: 6, message: "Minimum 6 characters required" },
+            ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
@@ -86,6 +103,7 @@ export default function ChangePassword() {
               color: "#fff",
               borderRadius: 6,
               height: 48,
+              border: "none",
             }}
           >
             CHANGE PASSWORD

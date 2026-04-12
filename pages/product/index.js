@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Row, Col, Spin } from "antd";
-import Navbar from "@/src/components/Navbar";
+import Navbar from "@/pages/components/Navbar";
 import { apiRequest } from "@/src/utils/api";
 import { useRouter } from "next/router";
 
 export default function ProductPage() {
-    const Router= useRouter();
+  const Router = useRouter();
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -25,14 +26,11 @@ export default function ProductPage() {
 
           setProducts(list);
 
-          // ✅ Extract unique categories
           const uniqueCategories = [
             ...new Set(list.map((p) => p.category?.toLowerCase())),
           ];
 
           setCategories(uniqueCategories);
-
-          // ✅ Default select first category
           setSelectedCategory(uniqueCategories[0] || "");
         }
       } catch (err) {
@@ -54,21 +52,38 @@ export default function ProductPage() {
     <>
       <Navbar />
 
-      <div style={{ padding: "100px 60px", background: "#f5f5f5" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: "100px 60px",
+          background:
+            "radial-gradient(circle at top left, #2a2a2a 0%, #111111 35%, #050505 70%, #000000 100%)",
+        }}
+      >
         <Row gutter={30}>
-          {/* 🔥 LEFT - DYNAMIC CATEGORY */}
+          {/* LEFT CATEGORY */}
           <Col span={4}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {categories.map((cat) => (
                 <div
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   style={{
-                    padding: "10px 15px",
+                    padding: "12px 16px",
                     cursor: "pointer",
                     background:
-                      selectedCategory === cat ? "#e5e5e5" : "transparent",
+                      selectedCategory === cat
+                        ? "rgba(245, 245, 220, 0.18)"
+                        : "rgba(255,255,255,0.04)",
+                    color: "#f5f5dc",
                     textTransform: "capitalize",
+                    borderRadius: 10,
+                    border:
+                      selectedCategory === cat
+                        ? "1px solid rgba(245,245,220,0.35)"
+                        : "1px solid rgba(255,255,255,0.08)",
+                    fontWeight: 500,
+                    transition: "0.3s ease",
                   }}
                 >
                   {cat}
@@ -77,93 +92,188 @@ export default function ProductPage() {
             </div>
           </Col>
 
-          {/* 🔥 RIGHT - PRODUCTS BASED ON CATEGORY */}
+          {/* RIGHT PRODUCTS */}
           <Col span={20}>
             {loading ? (
-              <Spin size="large" />
+              <div style={{ textAlign: "center", paddingTop: 100 }}>
+                <Spin size="large" />
+              </div>
             ) : (
               <>
                 {/* TOP BAR */}
                 <div
                   style={{
-                    background: "#3b0a0a",
-                    color: "#fff",
-                    padding: "10px 20px",
-                    marginBottom: 20,
-                    fontWeight: 500,
+                    background:
+                      "linear-gradient(90deg, #f5f5dc 0%, #d8c8a5 100%)",
+                    color: "#111",
+                    padding: "12px 22px",
+                    marginBottom: 25,
+                    fontWeight: 700,
+                    borderRadius: 10,
+                    boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
                   }}
                 >
-                  {filteredProducts.length} Items
+                  {filteredProducts.length} Items Found
                 </div>
 
-                <Row gutter={[30, 40]}>
-                  {filteredProducts.map((item) => (
-                    <Col key={item.id} xs={24} sm={12} md={8}>
-                    <div
-  style={{
-    background: "#fff",
-    padding: 10,
-    cursor: "pointer" // 👈 add this
-  }}
-  onClick={() => Router.push(`/product-view?id=${item.id}`)} // 👈 IMPORTANT
->
-                        {/* IMAGE */}
+                <Row gutter={[30, 35]}>
+                  {filteredProducts.map((item) => {
+                    const images = item?.defaultVariant?.images || [];
+
+                    return (
+                      <Col key={item.id} xs={24} sm={12} md={8}>
                         <div
+                          onClick={() =>
+                            Router.push(`/product-view?id=${item.id}`)
+                          }
                           style={{
-                            height: 300,
-                            position: "relative",
-                            overflow: "hidden",
+                            background:
+                              "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))",
+                            backdropFilter: "blur(10px)",
+                            padding: 14,
+                            cursor: "pointer",
+                            borderRadius: 18,
+                            border: "1px solid rgba(245,245,220,0.12)",
+                            boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+                            transition: "0.3s ease",
                           }}
                         >
-                          <img
-                            src={item?.defaultVariant?.mainImageUrl}
-                            alt=""
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
-
-                          {/* QUICK VIEW */}
+                          {/* IMAGE */}
                           <div
                             style={{
-                              position: "absolute",
-                              bottom: 0,
-                              width: "100%",
-                              background: "rgba(255,255,255,0.8)",
-                              textAlign: "center",
-                              padding: 8,
+                              height: 300,
+                              position: "relative",
+                              overflow: "hidden",
+                              borderRadius: 14,
                             }}
                           >
-                            Quick View
+                            <img
+                              src={item?.defaultVariant?.mainImageUrl}
+                              alt=""
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+
+                            {/* QUICK VIEW */}
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: 0,
+                                width: "100%",
+                                background: "rgba(0,0,0,0.55)",
+                                color: "#f5f5dc",
+                                textAlign: "center",
+                                padding: 10,
+                                fontWeight: 600,
+                                letterSpacing: 0.5,
+                              }}
+                            >
+                              Quick View
+                            </div>
                           </div>
+
+                          {/* DETAILS */}
+                          <div style={{ marginTop: 14, color: "#f5f5dc" }}>
+                            <div
+                              style={{
+                                fontSize: 12,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <b style={{ color: "#ffffff" }}>Article</b>{" "}
+                              {item?.defaultVariant?.article || "-"}
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <b style={{ color: "#ffffff" }}>Collection</b>{" "}
+                              {item?.collection || "-"}
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#d8c8a5",
+                                letterSpacing: 1,
+                                marginTop: 8,
+                              }}
+                            >
+                              BY MERAKI
+                            </div>
+                          </div>
+
+                          {/* AVAILABLE COLORS */}
+                          {images.length > 0 && (
+                            <div
+                              style={{
+                                marginTop: 16,
+                                background: "rgba(245,245,220,0.08)",
+                                padding: 12,
+                                borderRadius: 12,
+                                border:
+                                  "1px solid rgba(245,245,220,0.12)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  marginBottom: 10,
+                                  color: "#ffffff",
+                                  letterSpacing: 0.4,
+                                }}
+                              >
+                                Also available colours in this design
+                              </div>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                {images.slice(0, 4).map((img, index) => (
+                                  <img
+                                    key={index}
+                                    src={img}
+                                    alt=""
+                                    style={{
+                                      width: 34,
+                                      height: 34,
+                                      borderRadius: "50%",
+                                      objectFit: "cover",
+                                      border:
+                                        "2px solid rgba(245,245,220,0.5)",
+                                    }}
+                                  />
+                                ))}
+
+                                {images.length > 4 && (
+                                  <span
+                                    style={{
+                                      fontSize: 12,
+                                      color: "#f5f5dc",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    +{images.length - 4}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        {/* DETAILS */}
-                        <div style={{ marginTop: 10 }}>
-                          <div style={{ fontSize: 12 }}>
-                            <b>Article</b>{" "}
-                            {item?.defaultVariant?.article || "-"}
-                          </div>
-
-                          <div style={{ fontSize: 12 }}>
-                            <b>Collection</b> {item?.collection || "-"}
-                          </div>
-
-                          <div
-                            style={{
-                              fontSize: 12,
-                              marginTop: 5,
-                              color: "#777",
-                            }}
-                          >
-                            BY MERAKI
-                          </div>
-                        </div>
-                      </div>
-                    </Col>
-                  ))}
+                      </Col>
+                    );
+                  })}
                 </Row>
               </>
             )}
