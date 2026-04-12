@@ -1,3 +1,5 @@
+"use client";
+
 import { Form, Input, Button, Tabs, message } from "antd";
 import {
   UserOutlined,
@@ -22,7 +24,7 @@ import {
 export default function LoginPage() {
   const router = useRouter();
 
-  const [screenWidth, setScreenWidth] = useState(1024);
+  // const [screenWidth, setScreenWidth] = useState(1024);
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("IN");
   const [country, setCountry] = useState("India");
@@ -39,7 +41,7 @@ export default function LoginPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isMobile = screenWidth < 768;
+  // const isMobile = screenWidth < 768;
 
   /* ---------------- COUNTRY NAME ---------------- */
   const getCountryName = (iso) => {
@@ -92,6 +94,20 @@ export default function LoginPage() {
       setPhone(value);
     }
   };
+
+  const [screenWidth, setScreenWidth] = useState(1024);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = screenWidth < 768;
 
   /* ---------------- REQUEST ACCESS ---------------- */
   const onRequestAccess = async (values) => {
