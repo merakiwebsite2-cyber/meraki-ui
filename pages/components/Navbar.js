@@ -10,14 +10,16 @@ const { Header } = Layout;
 export default function Navbar() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
+    const loadUser = () => {
+      const storedEmail = localStorage.getItem("email");
+      setEmail(storedEmail || "");
+    };
+
+    loadUser();
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 60);
@@ -34,7 +36,18 @@ export default function Navbar() {
     router.push("/login");
   };
 
-  const items = [
+  // Protect Products Page
+  const handleProductsClick = () => {
+    const storedEmail = localStorage.getItem("email");
+
+    if (storedEmail) {
+      router.push("/product");
+    } else {
+      router.push("/login");
+    }
+  };
+
+  const dropdownItems = [
     {
       key: "1",
       label: (
@@ -50,6 +63,7 @@ export default function Navbar() {
       style={{
         position: "fixed",
         top: 0,
+        left: 0,
         width: "100%",
         zIndex: 1000,
         display: "flex",
@@ -58,13 +72,17 @@ export default function Navbar() {
         padding: "0 80px",
         height: 70,
         background: scrolled ? "rgba(0,0,0,0.9)" : "transparent",
+        transition: "all 0.3s ease",
       }}
     >
       {/* Logo */}
       <img
         src="/logo.png"
         alt="logo"
-        style={{ height: 80, cursor: "pointer" }}
+        style={{
+          height: 80,
+          cursor: "pointer",
+        }}
         onClick={() => router.push("/")}
       />
 
@@ -74,32 +92,77 @@ export default function Navbar() {
         selectable={false}
         style={{
           flex: 1,
+          display: "flex",
           justifyContent: "center",
           background: "transparent",
           borderBottom: "none",
         }}
         items={[
-          { key: "1", label: <span style={{ color: "#fff" }}>Home</span> },
-          { key: "2", label: <span style={{ color: "#fff" }}>Products</span> },
-          { key: "3", label: <span style={{ color: "#fff" }}>Contact</span> },
+          {
+            key: "1",
+            label: (
+              <span
+                style={{ color: "#fff" }}
+                onClick={() => router.push("/")}
+              >
+                Home
+              </span>
+            ),
+          },
+          {
+            key: "2",
+            label: (
+              <span
+                style={{ color: "#fff" }}
+                onClick={handleProductsClick}
+              >
+                Products
+              </span>
+            ),
+          },
+          {
+            key: "3",
+            label: (
+              <span
+                style={{ color: "#fff" }}
+                onClick={() => router.push("/contact")}
+              >
+                Contact
+              </span>
+            ),
+          },
         ]}
       />
 
       {/* Right Side */}
-      {email ? (
-        <Dropdown menu={{ items }} trigger={["click"]}>
+      {email === null ? null : email ? (
+        <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
           <div
             style={{
               color: "#fff",
               cursor: "pointer",
               fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
             }}
           >
-            {email} <DownOutlined />
+            {email}
+            <DownOutlined />
           </div>
         </Dropdown>
       ) : (
-        <Button onClick={() => router.push("/login")}>Sign in</Button>
+        <Button
+          onClick={() => router.push("/login")}
+          style={{
+            borderRadius: 20,
+            borderColor: "#fff",
+            color: "#fff",
+            background: "transparent",
+          }}
+        >
+          Sign in
+        </Button>
       )}
     </Header>
   );

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import Navbar from "@/src/components/Navbar";
+import Navbar from "@/pages/components/Navbar";
 import { apiRequest } from "@/src/utils/api";
 
 export default function ProductView() {

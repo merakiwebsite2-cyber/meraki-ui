@@ -4,18 +4,30 @@ import {
   MailOutlined,
   LockOutlined,
   ApartmentOutlined,
-  MobileOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
 import { apiRequest } from "@/src/utils/api";
 import { useEffect, useState } from "react";
 
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
+import {
+  AsYouType,
+  parsePhoneNumberFromString,
+  getCountryCallingCode,
+  isValidPhoneNumber,
+} from "libphonenumber-js";
+
 export default function LoginPage() {
   const router = useRouter();
-  const uuid = uuidv4();
 
   const [screenWidth, setScreenWidth] = useState(1024);
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("IN");
+  const [country, setCountry] = useState("India");
+
+  const [requestForm] = Form.useForm();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -29,10 +41,77 @@ export default function LoginPage() {
 
   const isMobile = screenWidth < 768;
 
+  /* ---------------- COUNTRY NAME ---------------- */
+  const getCountryName = (iso) => {
+    try {
+      const regionNames = new Intl.DisplayNames(["en"], {
+        type: "region",
+      });
+      return regionNames.of(iso) || "";
+    } catch {
+      return "";
+    }
+  };
+
+  /* ---------------- COUNTRY CHANGE ---------------- */
+  const handleCountryChange = (iso) => {
+    if (!iso) return;
+
+    setCountryCode(iso);
+
+    const name = getCountryName(iso);
+    setCountry(name);
+
+    requestForm.setFieldsValue({
+      country: name,
+    });
+
+    setPhone("");
+  };
+
+  /* ---------------- PHONE CHANGE ---------------- */
+  const handlePhoneChange = (value) => {
+    if (!value) {
+      setPhone("");
+      return;
+    }
+
+    try {
+      const formatter = new AsYouType(countryCode);
+      formatter.input(value);
+
+      const national = formatter.getNationalNumber() || "";
+      const template = formatter.getTemplate() || "";
+
+      const maxDigits = (template.match(/x/g) || []).length;
+
+      if (!maxDigits || national.length <= maxDigits) {
+        setPhone(value);
+      }
+    } catch {
+      setPhone(value);
+    }
+  };
+
   /* ---------------- REQUEST ACCESS ---------------- */
   const onRequestAccess = async (values) => {
     try {
-      const body = { ...values, isVerified: false };
+      if (!phone || !isValidPhoneNumber(phone)) {
+        message.error("Enter valid mobile number");
+        return;
+      }
+
+      const parsed = parsePhoneNumberFromString(phone);
+
+      const body = {
+        name: values.name,
+        email: values.email,
+        companyName: values.companyName,
+        mobileNo: parsed?.nationalNumber || "",
+        countryCode: `+${parsed?.countryCallingCode || getCountryCallingCode(countryCode)}`,
+        country: country,
+        isVerified: false,
+      };
 
       const data = await apiRequest({
         endpoint: "/auth/signup",
@@ -44,47 +123,54 @@ export default function LoginPage() {
         message.success(
           "User request has been sent to Meraki team. We will contact you soon."
         );
-        setTimeout(() => router.push("/"), 2000);
+
+        requestForm.resetFields();
+        setPhone("");
+        setCountryCode("IN");
+        setCountry("India");
+
+        setTimeout(() => router.push("/"), 1500);
       } else {
         message.error("Something went wrong! Try again later");
       }
     } catch (err) {
+      console.error(err);
       message.error("Server error! Try again");
     }
   };
 
   /* ---------------- LOGIN ---------------- */
- const onLogin = async (values) => {
-  try {
-    const data = await apiRequest({
-      endpoint: "/auth/login",
-      method: "POST",
-      body: values,
-    });
+  const onLogin = async (values) => {
+    try {
+      const data = await apiRequest({
+        endpoint: "/auth/login",
+        method: "POST",
+        body: values,
+      });
 
-    if (data?.success) {
-      localStorage.setItem("token", data?.data?.token);
-      localStorage.setItem("email", values.email);
+      if (data?.success) {
+        localStorage.setItem("token", data?.data?.token);
+        localStorage.setItem("email", values.email);
 
-      message.success("Login successful");
+        message.success("Login successful");
 
-      const mustChangePassword = data?.data?.mustChangePassword;
+        const mustChangePassword = data?.data?.mustChangePassword;
 
-      setTimeout(() => {
-        if (mustChangePassword) {
-          router.push("/password");
-        } else {
-          router.push("/product");
-        }
-      }, 1500);
-    } else {
-      message.error("Invalid credentials");
+        setTimeout(() => {
+          if (mustChangePassword) {
+            router.push("/password");
+          } else {
+            router.push("/product");
+          }
+        }, 1500);
+      } else {
+        message.error("Invalid credentials");
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Server error! Try again");
     }
-  } catch (err) {
-    console.error(err);
-    message.error("Server error! Try again");
-  }
-};
+  };
 
   return (
     <div
@@ -99,7 +185,6 @@ export default function LoginPage() {
         backgroundSize: "250px",
       }}
     >
-      {/* MAIN CONTAINER */}
       <div
         style={{
           display: "flex",
@@ -110,11 +195,11 @@ export default function LoginPage() {
           maxWidth: 1200,
         }}
       >
-        {/* LEFT VISUAL */}
         {!isMobile && (
           <div style={{ position: "relative" }}>
             <img
               src="/login2.png"
+              alt="login"
               style={{
                 width: 499,
                 height: 628,
@@ -124,6 +209,7 @@ export default function LoginPage() {
 
             <img
               src="/login1.png"
+              alt="overlay"
               style={{
                 position: "absolute",
                 top: 180,
@@ -135,7 +221,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* RIGHT FORM */}
         <div
           style={{
             width: isMobile ? "100%" : 420,
@@ -161,8 +246,23 @@ export default function LoginPage() {
                 key: "request",
                 label: "Request Access",
                 children: (
-                  <Form layout="vertical" onFinish={onRequestAccess}>
-                    <Form.Item name="name" rules={[{ required: true }]}>
+                  <Form
+                    form={requestForm}
+                    layout="vertical"
+                    onFinish={onRequestAccess}
+                    initialValues={{
+                      country: "India",
+                    }}
+                  >
+                    <Form.Item
+                      name="name"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Enter full name",
+                        },
+                      ]}
+                    >
                       <Input
                         prefix={<UserOutlined />}
                         placeholder="Full Name"
@@ -170,15 +270,52 @@ export default function LoginPage() {
                       />
                     </Form.Item>
 
-                    <Form.Item name="mobileNo" rules={[{ required: true }]}>
-                      <Input
-                        prefix={<MobileOutlined />}
-                        placeholder="Mobile"
-                        size="large"
+                    <Form.Item label="Mobile Number" required>
+                      <PhoneInput
+                        international
+                        defaultCountry="IN"
+                        country={countryCode}
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        onCountryChange={handleCountryChange}
+                        placeholder="Enter phone number"
+                        style={{
+                          border: "1px solid #d9d9d9",
+                          padding: "10px 12px",
+                          borderRadius: "8px",
+                        }}
                       />
                     </Form.Item>
 
-                    <Form.Item name="email" rules={[{ required: true }]}>
+                    <Form.Item
+                      name="country"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Country required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Country"
+                        size="large"
+                        disabled
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="email"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Enter email",
+                        },
+                        {
+                          type: "email",
+                          message: "Enter valid email",
+                        },
+                      ]}
+                    >
                       <Input
                         prefix={<MailOutlined />}
                         placeholder="Email"
@@ -188,7 +325,12 @@ export default function LoginPage() {
 
                     <Form.Item
                       name="companyName"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Enter company name",
+                        },
+                      ]}
                     >
                       <Input
                         prefix={<ApartmentOutlined />}
@@ -218,7 +360,15 @@ export default function LoginPage() {
                 label: "Login",
                 children: (
                   <Form layout="vertical" onFinish={onLogin}>
-                    <Form.Item name="email" rules={[{ required: true }]}>
+                    <Form.Item
+                      name="email"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Enter email",
+                        },
+                      ]}
+                    >
                       <Input
                         prefix={<MailOutlined />}
                         placeholder="Email"
@@ -226,7 +376,15 @@ export default function LoginPage() {
                       />
                     </Form.Item>
 
-                    <Form.Item name="password" rules={[{ required: true }]}>
+                    <Form.Item
+                      name="password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Enter password",
+                        },
+                      ]}
+                    >
                       <Input.Password
                         prefix={<LockOutlined />}
                         placeholder="Password"

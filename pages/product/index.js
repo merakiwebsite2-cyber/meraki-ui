@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Row, Col, Spin } from "antd";
-import Navbar from "@/src/components/Navbar";
+import Navbar from "@/pages/components/Navbar";
 import { apiRequest } from "@/src/utils/api";
 import { useRouter } from "next/router";
 

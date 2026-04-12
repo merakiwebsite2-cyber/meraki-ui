@@ -1,8 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Space, Tooltip, Tag, message, Select, Popconfirm } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  Space,
+  Tooltip,
+  message,
+  Select,
+  Popconfirm,
+  Tag,
+  Collapse,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 
 import AdminNavbar from "../Layout/AdminNavbar";
 import ReusableTable from "../UI/Table";
@@ -10,6 +22,8 @@ import { productCategory } from "@/src/utils/constant";
 import ProductFormModal from "./ProductCatalogueForm";
 import { apiRequest } from "@/src/utils/api";
 import Image from "next/image";
+
+const { Panel } = Collapse;
 
 const ProductCatalogueTable = () => {
   const [searchString, setSearchString] = useState("");
@@ -23,41 +37,44 @@ const ProductCatalogueTable = () => {
   const [createResponse, setCreateResponse] = useState();
   const [updateResponse, setUpdateResponse] = useState();
   const [loading, setLoading] = useState(false);
+
   const handleAddProduct = () => {
     setEditingProduct(null);
     setIsModalOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   const handleEdit = (record) => {
     setEditingProduct(record);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (record) => {
-    console.log("Delete product:", record);
     const data = await apiRequest({
       endpoint: `/products/${record.id}`,
       method: "DELETE",
     });
+
     setDeleteStatus(data);
-    if (data?.success) message.success("Product deleted successfully");
-    else message.error("Something went wrong!");
+
+    if (data?.success) {
+      message.success("Product deleted successfully");
+    } else {
+      message.error("Something went wrong!");
+    }
   };
 
   useEffect(() => {
     const fetchProductCatalogues = async () => {
       setLoading(true);
+
       const data = await apiRequest({
         endpoint: "/products",
         method: "GET",
         params: {
           page: currentPage,
           size: pageSize,
-          category: searchString,
           category: category,
+          search: searchString,
         },
       });
 
@@ -76,73 +93,154 @@ const ProductCatalogueTable = () => {
     deleteStatus?.success,
   ]);
 
+  const renderSpecification = (value) => {
+    if (!value) return "-";
+
+    const mainFields = [];
+    const extraFields = [];
+
+    Object.entries(value).forEach(([key, val]) => {
+      if (
+        typeof val !== "object" &&
+        val !== null &&
+        val !== "" &&
+        mainFields.length < 4
+      ) {
+        mainFields.push(
+          <Tag key={key} color="blue" style={{ marginBottom: 6 }}>
+            {key}: {String(val)}
+          </Tag>
+        );
+      } else {
+        extraFields.push({ key, val });
+      }
+    });
+
+    return (
+      <div style={{ maxWidth: 350 }}>
+        {/* Show compact tags */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 6,
+            marginBottom: extraFields.length ? 8 : 0,
+          }}
+        >
+          {mainFields}
+        </div>
+
+        {/* Expandable more details */}
+        {extraFields.length > 0 && (
+          <Collapse
+            ghost
+            size="small"
+            expandIconPosition="end"
+            style={{ background: "transparent" }}
+          >
+            <Panel
+              header={
+                <span style={{ fontSize: 13, color: "#1677ff" }}>
+                  <InfoCircleOutlined /> View More
+                </span>
+              }
+              key="1"
+            >
+              {extraFields.map((item, index) => {
+                if (
+                  typeof item.val === "object" &&
+                  item.val !== null &&
+                  !Array.isArray(item.val)
+                ) {
+                  return (
+                    <div key={index} style={{ marginBottom: 10 }}>
+                      <strong>{item.key}</strong>
+                      <div style={{ marginTop: 4, paddingLeft: 10 }}>
+                        {Object.entries(item.val).map(([k, v]) => (
+                          <Tag
+                            key={k}
+                            style={{ marginBottom: 6 }}
+                            color="default"
+                          >
+                            {k}: {String(v)}
+                          </Tag>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Tag key={index} style={{ marginBottom: 6 }}>
+                    {item.key}: {String(item.val)}
+                  </Tag>
+                );
+              })}
+            </Panel>
+          </Collapse>
+        )}
+      </div>
+    );
+  };
+
   const columns = [
     {
       title: "Image",
       dataIndex: "defaultVariant",
+      width: 90,
       render: (data) => (
-        <Image src={data?.mainImageUrl} width={50} height={50} alt="Test" />
+        <Image
+          src={data?.mainImageUrl}
+          width={55}
+          height={55}
+          alt="product"
+          style={{
+            borderRadius: 8,
+            objectFit: "cover",
+            border: "1px solid #f0f0f0",
+          }}
+        />
       ),
     },
     {
       title: "Category",
       dataIndex: "category",
+      width: 130,
+      ellipsis: true,
     },
     {
       title: "Collection",
       dataIndex: "category",
+      width: 130,
+      ellipsis: true,
     },
     {
       title: "Specification",
       dataIndex: "specification",
-  render: (value) => {
-  return (
-    <div>
-      {Object.entries(value || {}).map(([key, val], index) => {
-        // Handle nested objects (repeat, careInstructions)
-        if (typeof val === "object" && val !== null) {
-          return (
-            <div key={index}>
-              <strong>{key}:</strong>
-              {Object.entries(val).map(([k, v]) => (
-                <div key={k} style={{ marginLeft: 10 }}>
-                  {k}: {String(v)}
-                </div>
-              ))}
-            </div>
-          );
-        }
-
-        return (
-          <div key={index}>
-            <strong>{key}:</strong> {String(val)}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+      width: 420,
+      render: renderSpecification,
     },
     {
       title: "Article",
-      dataIndex: "",
-      render: (value) => value?.defaultVariant?.article,
+      width: 140,
+      render: (_, record) => record?.defaultVariant?.article || "-",
     },
-
     {
-      title: "collection",
-      dataIndex: "color",
-      render: (value) => value?.defaultVariant?.color,
+      title: "Color",
+      width: 120,
+      render: (_, record) => record?.defaultVariant?.color || "-",
     },
     {
       title: "Action",
       key: "action",
+      width: 100,
+      fixed: "right",
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Edit">
             <EditOutlined
               style={{
-                color: "var(--edit-icon)",
+                color: "#1677ff",
                 cursor: "pointer",
                 fontSize: 16,
               }}
@@ -161,7 +259,7 @@ const ProductCatalogueTable = () => {
             <Tooltip title="Delete">
               <DeleteOutlined
                 style={{
-                  color: "var(--delete-icon)",
+                  color: "#ff4d4f",
                   cursor: "pointer",
                   fontSize: 16,
                 }}
@@ -184,14 +282,15 @@ const ProductCatalogueTable = () => {
   return (
     <AdminNavbar>
       <Select
-        value={category}
+        value={category || undefined}
         allowClear
         placeholder="Select Category"
         options={productCategory}
-        onChange={(e) => {
-          setCategory(e);
+        onChange={(value) => setCategory(value || "")}
+        style={{
+          width: 220,
+          marginBottom: 20,
         }}
-        style={{ width: "200px", marginBottom: "20px" }}
       />
 
       <ReusableTable
@@ -199,7 +298,7 @@ const ProductCatalogueTable = () => {
         rowKey="id"
         title="Product Catalogue"
         columns={columns}
-        dataSource={products?.data?.content}
+        dataSource={products?.data?.content || []}
         searchText={searchString}
         setSearchText={setSearchString}
         pageSize={pageSize}
@@ -207,8 +306,10 @@ const ProductCatalogueTable = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         actions={headerActions}
-        totalItems={products?.data?.totalElements}
+        totalItems={products?.data?.totalElements || 0}
+        scroll={{ x: 1200 }}
       />
+
       <ProductFormModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
