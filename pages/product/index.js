@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { Row, Col, Spin, Empty } from "antd";
+import { Row, Col, Spin } from "antd";
 import Navbar from "@/pages/components/Navbar";
 import { apiRequest } from "@/src/utils/api";
 import { useRouter } from "next/router";
 
 export default function ProductPage() {
-  const router = useRouter();
+  const Router = useRouter();
 
   const [products, setProducts] = useState([]);
-  const [selectedSubCategory, setSelectedSubCategory] = useState("Indoor");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] =
+    useState("Indoor");
   const [loading, setLoading] = useState(true);
 
   const subCategoryTabs = [
@@ -26,10 +29,21 @@ export default function ProductPage() {
         });
 
         if (res?.success) {
-          setProducts(res?.data?.content || []);
+          const list = res?.data?.content || [];
+
+          setProducts(list);
+
+          const uniqueCategories = [
+            ...new Set(
+              list.map((p) => p.category?.toLowerCase())
+            ),
+          ];
+
+          setCategories(uniqueCategories);
+          setSelectedCategory(uniqueCategories[0] || "");
         }
-      } catch (error) {
-        console.error("PRODUCT ERROR:", error);
+      } catch (err) {
+        console.error("PRODUCT ERROR:", err);
       } finally {
         setLoading(false);
       }
@@ -40,9 +54,10 @@ export default function ProductPage() {
 
   /* ---------------- FILTER PRODUCTS ---------------- */
   const filteredProducts = products.filter(
-    (item) =>
-      (item?.subCategory || "").toLowerCase() ===
-      selectedSubCategory.toLowerCase()
+    (p) =>
+      p.category?.toLowerCase() === selectedCategory &&
+      (p?.subCategory || "").toLowerCase() ===
+        selectedSubCategory.toLowerCase()
   );
 
   return (
@@ -52,54 +67,55 @@ export default function ProductPage() {
       <div
         style={{
           minHeight: "100vh",
-          padding: "110px 55px 60px",
+          padding: "100px 60px",
           background:
-            "linear-gradient(135deg, #0f0f0f 0%, #151515 30%, #090909 100%)",
+            "radial-gradient(circle at top left, #2a2a2a 0%, #111111 35%, #050505 70%, #000000 100%)",
         }}
       >
-        {/* PREMIUM TOP TABS */}
+        {/* PREMIUM TOGGLE ONLY ADDED */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: 45,
+            marginBottom: 28,
           }}
         >
           <div
             style={{
               display: "flex",
-              gap: 14,
-              padding: 10,
-              borderRadius: 18,
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(14px)",
+              gap: 10,
+              padding: 8,
+              borderRadius: 16,
+              background: "rgba(255,255,255,0.05)",
               border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 12px 35px rgba(0,0,0,0.35)",
+              backdropFilter: "blur(10px)",
             }}
           >
             {subCategoryTabs.map((tab) => {
-              const active = selectedSubCategory === tab.value;
+              const active =
+                selectedSubCategory === tab.value;
 
               return (
                 <div
                   key={tab.value}
-                  onClick={() => setSelectedSubCategory(tab.value)}
+                  onClick={() =>
+                    setSelectedSubCategory(tab.value)
+                  }
                   style={{
-                    padding: "16px 34px",
+                    padding: "14px 28px",
                     minWidth: 220,
                     textAlign: "center",
-                    borderRadius: 14,
+                    borderRadius: 12,
                     cursor: "pointer",
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: 700,
-                    letterSpacing: 0.4,
                     transition: "all 0.3s ease",
                     color: active ? "#111" : "#f5f5dc",
                     background: active
                       ? "linear-gradient(135deg,#f5f5dc,#d8c8a5)"
                       : "transparent",
                     boxShadow: active
-                      ? "0 8px 22px rgba(245,245,220,0.25)"
+                      ? "0 8px 20px rgba(245,245,220,0.18)"
                       : "none",
                   }}
                 >
@@ -110,158 +126,118 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* LOADER */}
-        {loading ? (
-          <div style={{ textAlign: "center", paddingTop: 120 }}>
-            <Spin size="large" />
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div style={{ paddingTop: 100 }}>
-            <Empty description="No Products Found" />
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {filteredProducts.map((item) => {
-              const extraImages = item?.defaultVariant?.images || [];
-
-              return (
+        <Row gutter={30}>
+          {/* LEFT CATEGORY */}
+          <Col span={4}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              {categories.map((cat) => (
                 <div
-                  key={item.id}
-                  onClick={() =>
-                    router.push(`/product-view?id=${item.id}`)
-                  }
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1.4fr",
-                    gap: 24,
-                    padding: 24,
+                    padding: "12px 16px",
                     cursor: "pointer",
-                    borderRadius: 24,
                     background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-                    backdropFilter: "blur(14px)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
-                    transition: "all 0.3s ease",
+                      selectedCategory === cat
+                        ? "rgba(245, 245, 220, 0.18)"
+                        : "rgba(255,255,255,0.04)",
+                    color: "#f5f5dc",
+                    textTransform: "capitalize",
+                    borderRadius: 10,
+                    border:
+                      selectedCategory === cat
+                        ? "1px solid rgba(245,245,220,0.35)"
+                        : "1px solid rgba(255,255,255,0.08)",
+                    fontWeight: 500,
+                    transition: "0.3s ease",
                   }}
                 >
-                  {/* LEFT SIDE - PRODUCT NAME */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      padding: "10px 10px 10px 5px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 14,
-                        color: "#d8c8a5",
-                        letterSpacing: 2,
-                        marginBottom: 8,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      Meraki Collection
-                    </div>
+                  {cat}
+                </div>
+              ))}
+            </div>
+          </Col>
 
-                    <div
-                      style={{
-                        fontSize: 38,
-                        fontWeight: 800,
-                        lineHeight: 1.1,
-                        color: "#ffffff",
-                        marginBottom: 14,
-                      }}
-                    >
-                      {item?.collection || "Product"}
-                    </div>
+          {/* RIGHT PRODUCTS - SAME UI KEPT */}
+          <Col span={20}>
+            {loading ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  paddingTop: 100,
+                }}
+              >
+                <Spin size="large" />
+              </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #f5f5dc 0%, #d8c8a5 100%)",
+                    color: "#111",
+                    padding: "12px 22px",
+                    marginBottom: 25,
+                    fontWeight: 700,
+                    borderRadius: 10,
+                    boxShadow:
+                      "0 8px 20px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  {filteredProducts.length} Items Found
+                </div>
 
-                    <div
-                      style={{
-                        fontSize: 16,
-                        color: "#e6e6e6",
-                        marginBottom: 8,
-                      }}
-                    >
-                      Article:{" "}
-                      <span style={{ color: "#f5f5dc" }}>
-                        {item?.defaultVariant?.article || "-"}
-                      </span>
-                    </div>
+                <Row gutter={[30, 35]}>
+                  {filteredProducts.map((item) => {
+                    const images =
+                      item?.defaultVariant?.images || [];
 
-                    <div
-                      style={{
-                        fontSize: 15,
-                        color: "#bdbdbd",
-                        marginBottom: 18,
-                      }}
-                    >
-                      Category: {item?.category || "-"}
-                    </div>
-
-                    <div
-                      style={{
-                        display: "inline-block",
-                        width: "fit-content",
-                        padding: "10px 18px",
-                        borderRadius: 30,
-                        background:
-                          "linear-gradient(135deg,#f5f5dc,#d8c8a5)",
-                        color: "#111",
-                        fontWeight: 700,
-                        fontSize: 14,
-                      }}
-                    >
-                      View Product
-                    </div>
-                  </div>
-
-                  {/* RIGHT SIDE - IMAGES */}
-                  <div>
-                    {/* Main Image */}
-                    <div
-                      style={{
-                        height: 360,
-                        overflow: "hidden",
-                        borderRadius: 18,
-                        marginBottom: 14,
-                      }}
-                    >
-                      <img
-                        src={item?.defaultVariant?.mainImageUrl}
-                        alt=""
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-
-                    {/* Small Images */}
-                    {extraImages.length > 0 && (
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "repeat(4,1fr)",
-                          gap: 10,
-                        }}
+                    return (
+                      <Col
+                        key={item.id}
+                        xs={24}
+                        sm={12}
+                        md={8}
                       >
-                        {extraImages.slice(0, 4).map((img, index) => (
+                        <div
+                          onClick={() =>
+                            Router.push(
+                              `/product-view?id=${item.id}`
+                            )
+                          }
+                          style={{
+                            background:
+                              "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))",
+                            backdropFilter: "blur(10px)",
+                            padding: 14,
+                            cursor: "pointer",
+                            borderRadius: 18,
+                            border:
+                              "1px solid rgba(245,245,220,0.12)",
+                            boxShadow:
+                              "0 10px 30px rgba(0,0,0,0.45)",
+                            transition: "0.3s ease",
+                          }}
+                        >
                           <div
-                            key={index}
                             style={{
-                              height: 78,
-                              borderRadius: 12,
+                              height: 300,
+                              position: "relative",
                               overflow: "hidden",
-                              border:
-                                "1px solid rgba(255,255,255,0.08)",
+                              borderRadius: 14,
                             }}
                           >
                             <img
-                              src={img}
+                              src={
+                                item?.defaultVariant
+                                  ?.mainImageUrl
+                              }
                               alt=""
                               style={{
                                 width: "100%",
@@ -269,16 +245,150 @@ export default function ProductPage() {
                                 objectFit: "cover",
                               }}
                             />
+
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: 0,
+                                width: "100%",
+                                background:
+                                  "rgba(0,0,0,0.55)",
+                                color: "#f5f5dc",
+                                textAlign: "center",
+                                padding: 10,
+                                fontWeight: 600,
+                              }}
+                            >
+                              Quick View
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+
+                          <div
+                            style={{
+                              marginTop: 14,
+                              color: "#f5f5dc",
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: 12,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <b
+                                style={{
+                                  color: "#ffffff",
+                                }}
+                              >
+                                Article
+                              </b>{" "}
+                              {
+                                item?.defaultVariant
+                                  ?.article
+                              }
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <b
+                                style={{
+                                  color: "#ffffff",
+                                }}
+                              >
+                                Collection
+                              </b>{" "}
+                              {item?.collection}
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#d8c8a5",
+                                marginTop: 8,
+                              }}
+                            >
+                              BY MERAKI
+                            </div>
+                          </div>
+
+                          {images.length > 0 && (
+                            <div
+                              style={{
+                                marginTop: 16,
+                                background:
+                                  "rgba(245,245,220,0.08)",
+                                padding: 12,
+                                borderRadius: 12,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  marginBottom: 10,
+                                  color: "#ffffff",
+                                }}
+                              >
+                                Also available colours in
+                                this design
+                              </div>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                {images
+                                  .slice(0, 4)
+                                  .map((img, index) => (
+                                    <img
+                                      key={index}
+                                      src={img}
+                                      alt=""
+                                      style={{
+                                        width: 34,
+                                        height: 34,
+                                        borderRadius:
+                                          "50%",
+                                        objectFit: "cover",
+                                        border:
+                                          "2px solid rgba(245,245,220,0.5)",
+                                      }}
+                                    />
+                                  ))}
+
+                                {images.length > 4 && (
+                                  <span
+                                    style={{
+                                      fontSize: 12,
+                                      color:
+                                        "#f5f5dc",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    +
+                                    {images.length -
+                                      4}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </Col>
+                    );
+                  })}
+                </Row>
+              </>
+            )}
+          </Col>
+        </Row>
       </div>
     </>
   );
