@@ -5,10 +5,10 @@ import {
   Space,
   Tooltip,
   message,
-  Select,
   Popconfirm,
   Tag,
   Collapse,
+  Tabs,
 } from "antd";
 import {
   EditOutlined,
@@ -118,7 +118,6 @@ const ProductCatalogueTable = () => {
 
     return (
       <div style={{ maxWidth: 350 }}>
-        {/* Show compact tags */}
         <div
           style={{
             display: "flex",
@@ -130,21 +129,15 @@ const ProductCatalogueTable = () => {
           {mainFields}
         </div>
 
-        {/* Expandable more details */}
         {extraFields.length > 0 && (
-          <Collapse
-            ghost
-            size="small"
-            expandIconPosition="end"
-            style={{ background: "transparent" }}
-          >
+          <Collapse ghost size="small" expandIconPosition="end">
             <Panel
+              key="1"
               header={
                 <span style={{ fontSize: 13, color: "#1677ff" }}>
                   <InfoCircleOutlined /> View More
                 </span>
               }
-              key="1"
             >
               {extraFields.map((item, index) => {
                 if (
@@ -157,11 +150,7 @@ const ProductCatalogueTable = () => {
                       <strong>{item.key}</strong>
                       <div style={{ marginTop: 4, paddingLeft: 10 }}>
                         {Object.entries(item.val).map(([k, v]) => (
-                          <Tag
-                            key={k}
-                            style={{ marginBottom: 6 }}
-                            color="default"
-                          >
+                          <Tag key={k} style={{ marginBottom: 6 }}>
                             {k}: {String(v)}
                           </Tag>
                         ))}
@@ -206,13 +195,11 @@ const ProductCatalogueTable = () => {
       title: "Category",
       dataIndex: "category",
       width: 130,
-      ellipsis: true,
     },
     {
       title: "Collection",
-      dataIndex: "category",
-      width: 130,
-      ellipsis: true,
+      dataIndex: "collection",
+      width: 150,
     },
     {
       title: "Specification",
@@ -232,37 +219,25 @@ const ProductCatalogueTable = () => {
     },
     {
       title: "Action",
-      key: "action",
       width: 100,
       fixed: "right",
       render: (_, record) => (
-        <Space size="middle">
+        <Space>
           <Tooltip title="Edit">
             <EditOutlined
-              style={{
-                color: "#1677ff",
-                cursor: "pointer",
-                fontSize: 16,
-              }}
+              style={{ color: "#1677ff", cursor: "pointer" }}
               onClick={() => handleEdit(record)}
             />
           </Tooltip>
 
           <Popconfirm
             title="Delete Product"
-            description="Are you sure you want to delete this product?"
+            description="Are you sure?"
             onConfirm={() => handleDelete(record)}
-            okText="Yes"
-            cancelText="No"
-            okButtonProps={{ danger: true }}
           >
             <Tooltip title="Delete">
               <DeleteOutlined
-                style={{
-                  color: "#ff4d4f",
-                  cursor: "pointer",
-                  fontSize: 16,
-                }}
+                style={{ color: "#ff4d4f", cursor: "pointer" }}
               />
             </Tooltip>
           </Popconfirm>
@@ -279,18 +254,28 @@ const ProductCatalogueTable = () => {
     },
   ];
 
+  const tabItems = [
+    {
+      key: "",
+      label: "All",
+    },
+    ...productCategory.map((item) => ({
+      key: item.value,
+      label: item.label,
+    })),
+  ];
+
   return (
     <AdminNavbar>
-      <Select
-        value={category || undefined}
-        allowClear
-        placeholder="Select Category"
-        options={productCategory}
-        onChange={(value) => setCategory(value || "")}
-        style={{
-          width: 220,
-          marginBottom: 20,
+      {/* CATEGORY TABS */}
+      <Tabs
+        activeKey={category}
+        items={tabItems}
+        onChange={(key) => {
+          setCategory(key);
+          setCurrentPage(0);
         }}
+        style={{ marginBottom: 20 }}
       />
 
       <ReusableTable
@@ -307,7 +292,7 @@ const ProductCatalogueTable = () => {
         setCurrentPage={setCurrentPage}
         actions={headerActions}
         totalItems={products?.data?.totalElements || 0}
-        scroll={{ x: 1200 }}
+        scroll={{ x: 1300 }}
       />
 
       <ProductFormModal

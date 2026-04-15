@@ -206,4 +206,8 @@ export const productCategory = [
     label: "Cushions",
     value: "Cushions",
   },
+   {
+    label: "Uphoistory",
+    value: "Uphoistory",
+  },
 ];
