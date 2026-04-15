@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, Button, Card, Space, message, Typography, Checkbox } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  Button,
+  Card,
+  Space,
+  message,
+  Checkbox,
+} from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import ImageUpload from "../UI/ImageUpload";
 import { apiRequest } from "@/src/utils/api";
@@ -9,7 +19,18 @@ import { productCategory } from "@/src/utils/constant";
 
 const inputStyle = { width: 300 };
 
-export default function ProductFormModal({ open, onClose, initialValues = {}, setCreateResponse, setUpdateResponse }) {
+const subCategoryOptions = [
+  { label: "Indoor", value: "Indoor" },
+  { label: "Indoor / Outdoor", value: "Indoor/Outdoor" },
+];
+
+export default function ProductFormModal({
+  open,
+  onClose,
+  initialValues = {},
+  setCreateResponse,
+  setUpdateResponse,
+}) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [productCatalogue, setProductCatalogue] = useState(null);
@@ -20,15 +41,18 @@ export default function ProductFormModal({ open, onClose, initialValues = {}, se
       setProductCatalogue(null);
       return;
     }
+
     (async () => {
-      const data = await apiRequest({ endpoint: `/products/${initialValues.id}`, method: "GET" });
+      const data = await apiRequest({
+        endpoint: `/products/${initialValues.id}`,
+        method: "GET",
+      });
       setProductCatalogue(data);
     })();
   }, [initialValues?.id, form]);
 
   useEffect(() => {
     const data = productCatalogue?.data;
-
     if (!data?.product) return;
 
     const { product, variants = [] } = data;
@@ -37,19 +61,20 @@ export default function ProductFormModal({ open, onClose, initialValues = {}, se
       product: {
         id: product.id,
         category: product.category,
+        subCategory: product.subCategory,
         collection: product.collection,
 
+        martindale: product.martindale,
+        pilling: product.pilling,
+        flameRetardancy: product.flameRetardancy,
+        waterRepellent: product.waterRepellent,
+        attention: product.attention,
 
         specification: {
           length: product.specification?.length,
           width: product.specification?.width,
           composition: product.specification?.composition,
           weight: product.specification?.weight,
-          martindale: product.martindale,
-          pilling: product.pilling,
-          waterRepellent: product.waterRepellent,
-          flameRetardancy: product.flameRetardancy,
-          attention: product.attention,
 
           repeat: {
             vertical: product.specification?.repeat?.vertical,
@@ -100,24 +125,38 @@ export default function ProductFormModal({ open, onClose, initialValues = {}, se
           mainImageUrl: values.product.defaultVariant?.mainImageUrl?.[0],
         },
       },
-      variantList: (values.variantList || []).map(v => ({ ...v, mainImageUrl: v.mainImageUrl?.[0] })),
+
+      variantList: (values.variantList || []).map((v) => ({
+        ...v,
+        mainImageUrl: v.mainImageUrl?.[0],
+      })),
     };
 
     try {
       const isEdit = !!initialValues?.id;
+
       const data = await apiRequest({
-        endpoint: isEdit ? `/products/${initialValues.id}/update-with-urls` : "/products/create-with-urls",
+        endpoint: isEdit
+          ? `/products/${initialValues.id}/update-with-urls`
+          : "/products/create-with-urls",
         method: isEdit ? "PUT" : "POST",
         body: payload,
       });
 
       if (data?.success) {
-        message.success(isEdit ? "Product updated successfully" : "Product added successfully");
+        message.success(
+          isEdit
+            ? "Product updated successfully"
+            : "Product added successfully"
+        );
         onClose();
       } else {
         message.error("Something went wrong!");
       }
-      isEdit ? setUpdateResponse?.(data) : setCreateResponse?.(data);
+
+      isEdit
+        ? setUpdateResponse?.(data)
+        : setCreateResponse?.(data);
     } catch {
       message.error("API Error");
     } finally {
@@ -126,75 +165,341 @@ export default function ProductFormModal({ open, onClose, initialValues = {}, se
   };
 
   return (
-    <Modal title={initialValues?.id ? "Edit Catalogue" : "Add Catalogue"} open={open} onCancel={onClose} footer={null} width={800} destroyOnClose>
-      <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ variantList: [{}] }}>
-        <Space wrap>
-          <Form.Item name={["product", "id"]} hidden><Input /></Form.Item>
-          <Form.Item label="Category" name={["product", "category"]} rules={[{ required: true }]}><Select options={productCategory} style={inputStyle} /></Form.Item>
-          <Form.Item label="Collection" name={["product", "collection"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-          <Form.Item label="Martindale" name={["product", "martindale"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-          <Form.Item label="Pilling" name={["product", "pilling"]}><Input style={inputStyle} /></Form.Item>
-          <Form.Item label="Flame Retardancy" name={["product", "flameRetardancy"]}><Input style={inputStyle} /></Form.Item>
-          <Form.Item name={["product", "waterRepellent"]} valuePropName="checked"><Checkbox>Water Repellent</Checkbox></Form.Item>
-          <Form.Item label="Attention" name={["product", "attention"]} rules={[{ required: true }]}><Input.TextArea style={{ width: 620 }} rows={3} /></Form.Item>
+    <Modal
+      title={initialValues?.id ? "Edit Catalogue" : "Add Catalogue"}
+      open={open}
+      onCancel={onClose}
+      footer={null}
+      width={900}
+      destroyOnClose
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        initialValues={{ variantList: [{}] }}
+      >
+        <Form.Item name={["product", "id"]} hidden>
+          <Input />
+        </Form.Item>
+
+        {/* Category + SubCategory Right Side */}
+        <Space wrap align="start">
+          <Form.Item
+            label="Category"
+            name={["product", "category"]}
+            rules={[{ required: true, message: "Select category" }]}
+          >
+            <Select
+              options={productCategory}
+              style={inputStyle}
+              placeholder="Select Category"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Sub Category"
+            name={["product", "subCategory"]}
+            rules={[{ required: true, message: "Select sub category" }]}
+          >
+            <Select
+              options={subCategoryOptions}
+              style={inputStyle}
+              placeholder="Select Sub Category"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Collection"
+            name={["product", "collection"]}
+            rules={[{ required: true }]}
+          >
+            <Input style={inputStyle} />
+          </Form.Item>
+
+          <Form.Item
+            label="Martindale"
+            name={["product", "martindale"]}
+          >
+            <Input style={inputStyle} />
+          </Form.Item>
+
+          <Form.Item
+            label="Pilling"
+            name={["product", "pilling"]}
+          >
+            <Input style={inputStyle} />
+          </Form.Item>
+
+          <Form.Item
+            label="Flame Retardancy"
+            name={["product", "flameRetardancy"]}
+          >
+            <Input style={inputStyle} />
+          </Form.Item>
+
+          <Form.Item
+            name={["product", "waterRepellent"]}
+            valuePropName="checked"
+          >
+            <Checkbox>Water Repellent</Checkbox>
+          </Form.Item>
+
+          <Form.Item
+            label="Attention"
+            name={["product", "attention"]}
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea
+              rows={3}
+              style={{ width: 620 }}
+            />
+          </Form.Item>
         </Space>
 
+        {/* Specification */}
         <Card title="Specification" style={{ marginBottom: 16 }}>
           <Space wrap>
-            <Form.Item label="Length" name={["product", "specification", "length"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-            <Form.Item label="Width" name={["product", "specification", "width"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-            <Form.Item label="Composition" name={["product", "specification", "composition"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-            <Form.Item label="Weight" name={["product", "specification", "weight"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
+            <Form.Item
+              label="Length"
+              name={["product", "specification", "length"]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+
+            <Form.Item
+              label="Width"
+              name={["product", "specification", "width"]}
+              rules={[{ required: true }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+
+            <Form.Item
+              label="Composition"
+              name={["product", "specification", "composition"]}
+              rules={[{ required: true }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+
+            <Form.Item
+              label="Weight"
+              name={["product", "specification", "weight"]}
+              rules={[{ required: true }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
           </Space>
-          {/* <Typography.Text strong>Repeat (cm)</Typography.Text> */}
-          <Space wrap style={{ marginTop: 12 }}>
-            <Form.Item label="Vertical" name={["product", "specification", "repeat", "vertical"]} ><Input style={inputStyle} /></Form.Item>
-            <Form.Item label="Horizontal" name={["product", "specification", "repeat", "horizontal"]} ><Input style={inputStyle} /></Form.Item>
+
+          <Space wrap>
+            <Form.Item
+              label="Vertical"
+              name={[
+                "product",
+                "specification",
+                "repeat",
+                "vertical",
+              ]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+
+            <Form.Item
+              label="Horizontal"
+              name={[
+                "product",
+                "specification",
+                "repeat",
+                "horizontal",
+              ]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
           </Space>
         </Card>
 
-        <Card title="Care and Usage Instructions" style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-            {['wash', 'bleach', 'dry', 'iron', 'dryClean'].map((key) => (
-              <Form.Item key={key}     name={["product", "specification", "careInstructions", key]} valuePropName="checked" noStyle>
-                <Checkbox>{key === 'dryClean' ? 'Dry Clean' : key.charAt(0).toUpperCase() + key.slice(1)}</Checkbox>
+        {/* Care Instructions */}
+        <Card
+          title="Care and Usage Instructions"
+          style={{ marginBottom: 16 }}
+        >
+          <Space wrap>
+            {[
+              "wash",
+              "bleach",
+              "dry",
+              "iron",
+              "dryClean",
+            ].map((key) => (
+              <Form.Item
+                key={key}
+                name={[
+                  "product",
+                  "specification",
+                  "careInstructions",
+                  key,
+                ]}
+                valuePropName="checked"
+                noStyle
+              >
+                <Checkbox>
+                  {key === "dryClean"
+                    ? "Dry Clean"
+                    : key.charAt(0).toUpperCase() +
+                      key.slice(1)}
+                </Checkbox>
               </Form.Item>
             ))}
-          </div>
+          </Space>
         </Card>
 
+        {/* Default Variant */}
         <Card title="Default Variant" style={{ marginBottom: 16 }}>
           <Space wrap>
-            <Form.Item name={["product", "defaultVariant", "id"]} hidden><Input /></Form.Item>
-            <Form.Item label="Article" name={["product", "defaultVariant", "article"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
-            <Form.Item label="Color" name={["product", "defaultVariant", "color"]} rules={[{ required: true }]}><Input style={inputStyle} /></Form.Item>
+            <Form.Item
+              name={["product", "defaultVariant", "id"]}
+              hidden
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Article"
+              name={["product", "defaultVariant", "article"]}
+              rules={[{ required: true }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+
+            <Form.Item
+              label="Color"
+              name={["product", "defaultVariant", "color"]}
+              rules={[{ required: true }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
           </Space>
+
           <Space wrap>
-            <Form.Item label="Main Image" name={["product", "defaultVariant", "mainImageUrl"]} valuePropName="value" getValueFromEvent={(v) => v} rules={[{ required: true }]}><ImageUpload maxCount={1} /></Form.Item>
-            <Form.Item label="Images" name={["product", "defaultVariant", "images"]} valuePropName="value" getValueFromEvent={(v) => v}><ImageUpload maxCount={3} /></Form.Item>
+            <Form.Item
+              label="Main Image"
+              name={[
+                "product",
+                "defaultVariant",
+                "mainImageUrl",
+              ]}
+              valuePropName="value"
+              getValueFromEvent={(v) => v}
+              rules={[{ required: true }]}
+            >
+              <ImageUpload maxCount={1} />
+            </Form.Item>
+
+            <Form.Item
+              label="Images"
+              name={["product", "defaultVariant", "images"]}
+              valuePropName="value"
+              getValueFromEvent={(v) => v}
+            >
+              <ImageUpload maxCount={3} />
+            </Form.Item>
           </Space>
         </Card>
 
+        {/* Variants */}
         <Form.List name="variantList">
-          {(fields, { add, remove }) => <>
-            {fields.map(({ key, name, ...restField }) => (
-              <Card key={key} title={`Variant ${name + 1}`} extra={<MinusCircleOutlined onClick={() => remove(name)} />} style={{ marginBottom: 16 }}>
-                <Form.Item {...restField} name={[name, 'id']} hidden><Input /></Form.Item>
-                <Form.Item {...restField} label="Article" name={[name, 'article']} rules={[{ required: true }]}><Input /></Form.Item>
-                <Form.Item {...restField} label="Color" name={[name, 'color']} rules={[{ required: true }]}><Input /></Form.Item>
-                <Space wrap>
-                  <Form.Item {...restField} label="Main Image" name={[name, 'mainImageUrl']} valuePropName="value" getValueFromEvent={(v) => v}><ImageUpload maxCount={1} /></Form.Item>
-                  <Form.Item {...restField} label="Images" name={[name, 'images']} valuePropName="value" getValueFromEvent={(v) => v}><ImageUpload maxCount={3} /></Form.Item>
-                </Space>
-              </Card>
-            ))}
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => add()} block>Add Variant</Button>
-          </>}
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Card
+                  key={key}
+                  title={`Variant ${name + 1}`}
+                  extra={
+                    <MinusCircleOutlined
+                      onClick={() => remove(name)}
+                    />
+                  }
+                  style={{ marginBottom: 16 }}
+                >
+                  <Form.Item
+                    {...restField}
+                    name={[name, "id"]}
+                    hidden
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    label="Article"
+                    name={[name, "article"]}
+                    rules={[{ required: true }]}
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    label="Color"
+                    name={[name, "color"]}
+                    rules={[{ required: true }]}
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Space wrap>
+                    <Form.Item
+                      {...restField}
+                      label="Main Image"
+                      name={[name, "mainImageUrl"]}
+                      valuePropName="value"
+                      getValueFromEvent={(v) => v}
+                    >
+                      <ImageUpload maxCount={1} />
+                    </Form.Item>
+
+                    <Form.Item
+                      {...restField}
+                      label="Images"
+                      name={[name, "images"]}
+                      valuePropName="value"
+                      getValueFromEvent={(v) => v}
+                    >
+                      <ImageUpload maxCount={3} />
+                    </Form.Item>
+                  </Space>
+                </Card>
+              ))}
+
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => add()}
+                block
+              >
+                Add Variant
+              </Button>
+            </>
+          )}
         </Form.List>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+            marginTop: 20,
+          }}
+        >
           <Button onClick={onClose}>Close</Button>
-          <Button type="primary" htmlType="submit" loading={loading}>Submit</Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
+            Submit
+          </Button>
         </div>
       </Form>
     </Modal>
