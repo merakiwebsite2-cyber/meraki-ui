@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState,useRef } from "react";
 import { Row, Col, Spin } from "antd";
 import Navbar from "@/pages/components/Navbar";
 import { apiRequest } from "@/src/utils/api";
@@ -7,12 +7,18 @@ import { useRouter } from "next/router";
 export default function ProductPage() {
   const Router = useRouter();
 
-  const [products, setProducts] = useState([]);
+
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] =
     useState("Indoor");
-  const [loading, setLoading] = useState(true);
+ const [products, setProducts] = useState([]);
+
+const [page, setPage] = useState(0);
+const [hasMore, setHasMore] = useState(true);
+
+const [loading, setLoading] = useState(true);
+const [loadingMore, setLoadingMore] = useState(false);
 
   const subCategoryTabs = [
     { label: "Indoor", value: "Indoor" },
@@ -20,36 +26,53 @@ export default function ProductPage() {
   ];
 
   /* ---------------- FETCH PRODUCTS ---------------- */
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await apiRequest({
-          endpoint: "/products",
-          method: "GET",
-        });
 
-        if (res?.success) {
-          const list = res?.data?.content || [];
+const fetchProducts = async (pageNo = 0, reset = false) => {
+  try {
+    if (pageNo === 0) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
 
-          setProducts(list);
+    const res = await apiRequest({
+      endpoint: `/products?page=${pageNo}&size=10`,
+      method: "GET",
+    });
 
-          const uniqueCategories = [
-            ...new Set(
-              list.map((p) => p.category?.toLowerCase())
-            ),
-          ];
+    if (res?.success) {
+      const response = res.data;
 
-          setCategories(uniqueCategories);
-          setSelectedCategory(uniqueCategories[0] || "");
-        }
-      } catch (err) {
-        console.error("PRODUCT ERROR:", err);
-      } finally {
-        setLoading(false);
+      const newProducts = response.content || [];
+
+      setProducts((prev) =>
+        reset ? newProducts : [...prev, ...newProducts]
+      );
+
+      setHasMore(!response.last);
+
+      if (reset) {
+        const uniqueCategories = [
+          ...new Set(
+            newProducts.map((p) =>
+              p.category?.toLowerCase()
+            )
+          ),
+        ];
+
+        setCategories(uniqueCategories);
+        setSelectedCategory(uniqueCategories[0] || "");
       }
-    };
-
-    fetchProducts();
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+    setLoadingMore(false);
+  }
+};
+  useEffect(() => {
+ fetchProducts(0, true);
   }, []);
 
   /* ---------------- FILTER PRODUCTS ---------------- */
@@ -59,6 +82,39 @@ export default function ProductPage() {
       (p?.subCategory || "").toLowerCase() ===
         selectedSubCategory.toLowerCase()
   );
+
+  const observer = useRef();
+
+const lastProductRef = useCallback(
+  (node) => {
+    if (loadingMore) return;
+
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore
+        ) {
+          const nextPage = page + 1;
+          setPage(nextPage);
+          fetchProducts(nextPage);
+        }
+      },
+      {
+        threshold: 0.2,
+      }
+    );
+
+    if (node) {
+      observer.current.observe(node);
+    }
+  },
+  [page, hasMore, loadingMore]
+);
 
   return (
     <>
@@ -194,12 +250,17 @@ export default function ProductPage() {
                 </div>
 
                 <Row gutter={[30, 35]}>
-                  {filteredProducts.map((item) => {
+                  {filteredProducts.map((item,index) => {
                     const images =
                       item?.defaultVariant?.images || [];
 
                     return (
                       <Col
+                       ref={
+        index === filteredProducts.length - 1
+            ? lastProductRef
+            : null
+    }
                         key={item.id}
                         xs={24}
                         sm={12}
@@ -389,6 +450,16 @@ export default function ProductPage() {
             )}
           </Col>
         </Row>
+        {loadingMore && (
+    <div
+        style={{
+            textAlign: "center",
+            padding: 30,
+        }}
+    >
+        <Spin />
+    </div>
+)}
       </div>
     </>
   );
