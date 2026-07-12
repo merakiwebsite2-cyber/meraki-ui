@@ -7,6 +7,7 @@ import DesignServiceSection from "./components/DesignService";
 import WhyWe from "./components/WhyWe";
 import TrendingWorkSection from "./components/TrendingWorkSection";
 import TestimonialsSection from "./components/Testimonial";
+import Footer from "./components/Footer";
 // import PageWrapper from "./pagewrapper";
 
 export default function Home() {
@@ -53,6 +54,7 @@ export default function Home() {
       <DesignServiceSection />
       {/* <NewArrivals /> */}
       <TrendingWorkSection />
+      <Footer/>
       {/* <WhyWe /> */}
       
       {/* <TestimonialsSection /> */}
