@@ -150,7 +150,7 @@ export default function Footer() {
               <MailOutlined style={{ color: "#1677ff" }} />
 
               <Text style={{ color: "#cbd5e1" }}>
-                info@yourcompany.com
+                info@meraki.ae
               </Text>
             </Space>
           </Space>
