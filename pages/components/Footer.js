@@ -46,18 +46,7 @@ export default function Footer() {
             }}
             onClick={() => router.push("/")}
           />
-<br/>
-          <Text
-            style={{
-              color: "#cbd5e1",
-              fontSize: 15,
-              lineHeight: 1.8,
-            }}
-          >
-            Delivering innovative technology solutions with quality,
-            reliability, and customer satisfaction. We believe in building
-            products that make businesses smarter and more efficient.
-          </Text>
+
         </Col>
 
         {/* Quick Links */}
@@ -150,7 +139,7 @@ export default function Footer() {
               <MailOutlined style={{ color: "#1677ff" }} />
 
               <Text style={{ color: "#cbd5e1" }}>
-                info@meraki.ae
+                info@meraki-interiors.ae
               </Text>
             </Space>
           </Space>
