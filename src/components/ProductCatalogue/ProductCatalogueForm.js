@@ -99,6 +99,15 @@ export default function ProductFormModal({
             : [],
           images: product.defaultVariant?.images || [],
         },
+        seaWaterRepelency: product.seaWaterRepelency,
+        chlorinatedWaterRepelency: product.chlorinatedWaterRepelency,
+        acidRepelency: product.acidRepelency,
+        alkalineRepelency: product.alkalineRepelency,
+        colorFastness: product.colorFastness,
+        usage: {
+          sofa: product.usage?.sofa ?? false,
+          pillow: product.usage?.pillow ?? false,
+        },
       },
 
       variantList:
@@ -224,26 +233,103 @@ export default function ProductFormModal({
             <Input style={inputStyle} />
           </Form.Item>
 
-          <Form.Item
-            label="Pilling"
-            name={["product", "pilling"]}
-          >
-            <Input style={inputStyle} />
-          </Form.Item>
+<Card
+  title="Performance & Durability"
+  style={{ marginBottom: 16 }}
+>
+  <Space wrap align="start">
 
-          <Form.Item
-            label="Flame Retardancy"
-            name={["product", "flameRetardancy"]}
-          >
-            <Input style={inputStyle} />
-          </Form.Item>
+    <Form.Item
+      label="Pilling"
+      name={["product", "pilling"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
 
-          <Form.Item
-            name={["product", "waterRepellent"]}
-            valuePropName="checked"
-          >
-            <Checkbox>Water Repellent</Checkbox>
-          </Form.Item>
+    <Form.Item
+      label="Flame Retardancy"
+      name={["product", "flameRetardancy"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      label="Sea Water Repellency"
+      name={["product", "seaWaterRepelency"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      label="Chlorinated Water Repellency"
+      name={["product", "chlorinatedWaterRepelency"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      label="Acid Repellency"
+      name={["product", "acidRepelency"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      label="Alkaline Repellency"
+      name={["product", "alkalineRepelency"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      label="Color Fastness"
+      name={["product", "colorFastness"]}
+    >
+      <Input style={inputStyle} />
+    </Form.Item>
+
+    <Form.Item
+      name={["product", "waterRepellent"]}
+      valuePropName="checked"
+      style={{ width: 300, marginTop: 30 }}
+    >
+      <Checkbox>
+        Water Repellent
+      </Checkbox>
+    </Form.Item>
+
+  </Space>
+</Card>
+
+{/* Usage */}
+<Card
+  title="Usage"
+  style={{ marginBottom: 16 }}
+>
+  <div style={{ marginBottom: 12, color: "#666", fontSize: 14 }}>
+    Select where this fabric can be used
+  </div>
+
+  <Space size={24} wrap>
+    <Form.Item
+      name={["product", "usage", "sofa"]}
+      valuePropName="checked"
+      noStyle
+    >
+      <Checkbox>Sofa</Checkbox>
+    </Form.Item>
+
+    <Form.Item
+      name={["product", "usage", "pillow"]}
+      valuePropName="checked"
+      noStyle
+    >
+      <Checkbox>Pillow</Checkbox>
+    </Form.Item>
+
+
+  </Space>
+</Card>
 
           <Form.Item
             label="Attention"
@@ -347,7 +433,7 @@ export default function ProductFormModal({
                   {key === "dryClean"
                     ? "Dry Clean"
                     : key.charAt(0).toUpperCase() +
-                      key.slice(1)}
+                    key.slice(1)}
                 </Checkbox>
               </Form.Item>
             ))}

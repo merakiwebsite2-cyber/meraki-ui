@@ -178,6 +178,7 @@ const ProductCatalogueTable = () => {
       dataIndex: "defaultVariant",
       width: 90,
       render: (data) => (
+        
         <Image
           src={data?.mainImageUrl}
           width={55}

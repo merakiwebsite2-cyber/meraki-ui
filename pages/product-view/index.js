@@ -7,6 +7,9 @@ import {
   Wind,
   Shirt,
   CircleDot,
+  Sofa,
+  Armchair,
+  BedDouble,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -172,26 +175,73 @@ const handleSampleRequest = async () => {
     </div>
   );
 
-  const rows = [
-    ["Width (cm)", product?.specification?.width],
-    ["Composition", product?.specification?.composition],
-    ["Weight", product?.specification?.weight],
-    ["Vertical Repeat", product?.specification?.repeat?.vertical],
-    ["Horizontal Repeat", product?.specification?.repeat?.horizontal],
-    ["Fire retardant", product?.specification?.flameRetardancy],
-    ["Martindale", product?.specification?.martindale],
-    ["Care & Usage Instructions", careInstructionView],
-    ["Pilling", product?.specification?.pilling],
-    ["Water Repellent", product?.specification?.waterRepellent],
-    ["Attention", product?.specification?.attention],
-  ].filter(
-    (item) =>
-      Array.isArray(item) &&
-      item.length === 2 &&
-      item[1] !== null &&
-      item[1] !== undefined &&
-      item[1] !== ""
-  );
+const usageView =
+  product?.specification?.usage &&
+  typeof product.specification.usage === "object" ? (
+    <div
+      style={{
+        display: "flex",
+        gap: 18,
+        flexWrap: "wrap",
+        alignItems: "center",
+      }}
+    >
+      {Object.keys(product.specification.usage)
+        .filter((key) => product.specification.usage[key] === true)
+        .map((key) => {
+          const usageItem = usageIcons[key];
+
+          if (!usageItem) return null;
+
+          return (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                minWidth: 48,
+                color: "#f5e6c8",
+              }}
+            >
+              {usageItem.icon}
+
+              <span style={{ fontSize: 10 }}>
+                {usageItem.label}
+              </span>
+            </div>
+          );
+        })}
+    </div>
+  ) : null;
+
+const rows = [
+  ["Width (cm)", product?.specification?.width],
+  ["Composition", product?.specification?.composition],
+  ["Weight", product?.specification?.weight],
+  ["Vertical Repeat", product?.specification?.repeat?.vertical],
+  ["Horizontal Repeat", product?.specification?.repeat?.horizontal],
+  ["Fire retardant", product?.specification?.flameRetardancy],
+  ["Martindale", product?.specification?.martindale],
+
+  ["Care Instructions", careInstructionView],
+
+  product?.specification?.usage
+    ? ["Usage", usageView]
+    : null,
+
+  ["Pilling", product?.specification?.pilling],
+  ["Water Repellent", product?.specification?.waterRepellent],
+  ["Attention", product?.specification?.attention],
+].filter(
+  (item) =>
+    Array.isArray(item) &&
+    item.length === 2 &&
+    item[1] !== null &&
+    item[1] !== undefined &&
+    item[1] !== ""
+);
 
   const borderColor = "rgba(245,230,200,0.25)";
   const textPrimary = "#f5e6c8";
