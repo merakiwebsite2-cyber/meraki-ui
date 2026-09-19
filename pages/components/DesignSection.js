@@ -30,7 +30,7 @@ function useReveal(threshold = 0.2) {
 export default function DesignSection() {
     const router = useRouter();
    const handleAppointmentClick = () => {
-    router.push("/login");
+    router.push("/contact");
   };
   const [sectionRef, visible] = useReveal();
 
