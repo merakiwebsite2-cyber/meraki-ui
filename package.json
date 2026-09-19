@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@emailjs/browser": "^4.4.1",
     "antd": "^6.3.2",
     "framer-motion": "^7.10.3",
     "html2canvas": "^1.4.1",

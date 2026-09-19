@@ -21,8 +21,9 @@ const [loading, setLoading] = useState(true);
 const [loadingMore, setLoadingMore] = useState(false);
 
   const subCategoryTabs = [
+      { label: "Indoor / Outdoor", value: "Indoor/Outdoor" },
     { label: "Indoor", value: "Indoor" },
-    { label: "Indoor / Outdoor", value: "Indoor/Outdoor" },
+  
   ];
 
   /* ---------------- FETCH PRODUCTS ---------------- */

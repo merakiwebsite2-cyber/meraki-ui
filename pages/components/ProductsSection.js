@@ -57,7 +57,7 @@ useEffect(() => {
     if (!token) {
       window.location.href = "/login";
     } else {
-      window.location.href = `/products?category=${item.title}`;
+      window.location.href = `/product`;
     }
   };
 

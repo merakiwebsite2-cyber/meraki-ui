@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Spin, Tabs, message } from "antd";
 import {
   Waves,
@@ -137,26 +137,33 @@ const handleSampleRequest = async () => {
     }
   };
 
-  const careIcons = {
-    wash: { icon: <Waves size={22} />, label: "WASH" },
-    bleach: { icon: <FlaskConical size={22} />, label: "BLEACH" },
-    dry: { icon: <Wind size={22} />, label: "DRY" },
-    iron: { icon: <Shirt size={22} />, label: "IRON" },
-    dryClean: { icon: <CircleDot size={22} />, label: "DRYCLEAN" },
-  };
+const careIcons = {
+  wash: { icon: Waves, label: "WASH" },
+  bleach: { icon: FlaskConical, label: "BLEACH" },
+  dry: { icon: Wind, label: "DRY" },
+  iron: { icon: Shirt, label: "IRON" },
+  dryClean: { icon: CircleDot, label: "DRYCLEAN" },
+};
 
-  const careInstructionView = (
-    <div
-      style={{
-        display: "flex",
-        gap: 18,
-        flexWrap: "wrap",
-        alignItems: "center",
-      }}
-    >
-      {Object.keys(product?.specification?.careInstructions || {})
-        .filter((key) => product?.specification?.careInstructions?.[key])
-        .map((key) => (
+const careInstructionView = (
+  <div
+    style={{
+      display: "flex",
+      gap: 18,
+      flexWrap: "wrap",
+      alignItems: "center",
+    }}
+  >
+    {Object.keys(product?.specification?.careInstructions || {})
+      .filter(
+        (key) => product?.specification?.careInstructions?.[key]
+      )
+      .map((key) => {
+        const Icon = careIcons[key]?.icon;
+
+        if (!Icon) return null;
+
+        return (
           <div
             key={key}
             style={{
@@ -168,12 +175,92 @@ const handleSampleRequest = async () => {
               color: "#f5e6c8",
             }}
           >
-            {careIcons[key]?.icon}
-            <span style={{ fontSize: 10 }}>{careIcons[key]?.label}</span>
+            <Icon size={22} />
+
+            <span style={{ fontSize: 10 }}>
+              {careIcons[key]?.label}
+            </span>
           </div>
-        ))}
-    </div>
-  );
+        );
+      })}
+  </div>
+);
+
+ const pdfCareInstructionView = (
+  <div
+    style={{
+      display: "flex",
+      gap: 18,
+      flexWrap: "wrap",
+      alignItems: "center",
+    }}
+  >
+    {Object.keys(product?.specification?.careInstructions || {})
+      .filter(
+        (key) => product?.specification?.careInstructions?.[key]
+      )
+      .map((key) => {
+        const Icon = careIcons[key]?.icon;
+
+        if (!Icon) return null;
+
+        return (
+          <div
+            key={key}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+              minWidth: 48,
+              color: "#333",
+            }}
+          >
+            <Icon
+              size={22}
+              color="#333"
+              strokeWidth={1.8}
+            />
+
+            <span
+              style={{
+                fontSize: 10,
+                color: "#333",
+              }}
+            >
+              {careIcons[key]?.label}
+            </span>
+          </div>
+        );
+      })}
+  </div>
+);
+const pdfRows = [
+  ["Width (cm)", product?.specification?.width],
+  ["Composition", product?.specification?.composition],
+  ["Weight", product?.specification?.weight],
+  ["Vertical Repeat", product?.specification?.repeat?.vertical],
+  ["Horizontal Repeat", product?.specification?.repeat?.horizontal],
+  ["Fire retardant", product?.specification?.flameRetardancy],
+  ["Martindale", product?.specification?.martindale],
+
+  ["Care Instructions", pdfCareInstructionView],
+
+  product?.specification?.usage
+    ? ["Usage", usageView]
+    : null,
+
+  ["Pilling", product?.specification?.pilling],
+  ["Water Repellent", product?.specification?.waterRepellent],
+  ["Attention", product?.specification?.attention],
+].filter(
+  (item) =>
+    Array.isArray(item) &&
+    item.length === 2 &&
+    item[1] !== null &&
+    item[1] !== undefined &&
+    item[1] !== ""
+);
 
 const usageView =
   product?.specification?.usage &&
@@ -571,7 +658,7 @@ const rows = [
         >
           <div style={{ textAlign: "center", paddingTop: 10 }}>
             <img
-              src="/logo.png"
+              src="/spreadsheet.png"
               alt="logo"
               style={{ height: 55, objectFit: "contain" }}
             />
@@ -607,7 +694,7 @@ const rows = [
                 background: "#ececec",
               }}
             >
-              {rows.map(([label, value], index) => (
+              {pdfRows.map(([label, value], index) => (
                 <div
                   key={index}
                   style={{
