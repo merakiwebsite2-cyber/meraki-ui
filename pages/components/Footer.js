@@ -9,7 +9,6 @@ import {
   Divider,
 } from "antd";
 import {
-  FacebookFilled,
   LinkedinFilled,
   InstagramFilled,
   MailOutlined,
@@ -23,6 +22,16 @@ const { Title, Text } = Typography;
 
 export default function Footer() {
   const router = useRouter();
+  const socialLinkStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    paddingBottom: 6,
+    borderBottom: "1px solid rgba(255,255,255,.2)",
+    color: "#cbd5e1",
+    fontSize: 13,
+    textDecoration: "none",
+  };
 
   return (
     <AntFooter
@@ -91,6 +100,40 @@ export default function Footer() {
 
         {/* Contact */}
         <Col xs={24} sm={12} md={7}>
+          <Space size="middle" wrap style={{ marginBottom: 24 }}>
+            <Text
+              style={{
+                color: "#94a3b8",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+              }}
+            >
+              FOLLOW US
+            </Text>
+            <a
+              href="https://www.instagram.com/merakistudioae/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Meraki Studio on Instagram"
+              style={socialLinkStyle}
+            >
+              <InstagramFilled />
+              Instagram
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/meraki-studio-17191b286/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Meraki Studio on LinkedIn"
+              style={socialLinkStyle}
+            >
+              <LinkedinFilled />
+              LinkedIn
+            </a>
+          </Space>
+
           <Title
             level={4}
             style={{
@@ -131,7 +174,7 @@ export default function Footer() {
               <PhoneOutlined style={{ color: "#1677ff" }} />
 
               <Text style={{ color: "#cbd5e1" }}>
-                +971-4-5771009
+                +971-4-5771009, +971-50-6724397
               </Text>
             </Space>
 
@@ -162,40 +205,6 @@ export default function Footer() {
           <Text style={{ color: "#94a3b8" }}>
             © {new Date().getFullYear()} Your Company. All Rights Reserved.
           </Text>
-        </Col>
-
-        <Col
-          xs={24}
-          md={12}
-          style={{
-            textAlign: "right",
-          }}
-        >
-          <Space size="large">
-            <FacebookFilled
-              style={{
-                fontSize: 24,
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            />
-
-            <InstagramFilled
-              style={{
-                fontSize: 24,
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            />
-
-            <LinkedinFilled
-              style={{
-                fontSize: 24,
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            />
-          </Space>
         </Col>
       </Row>
     </AntFooter>
